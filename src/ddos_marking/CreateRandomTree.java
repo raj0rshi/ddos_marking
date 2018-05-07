@@ -163,9 +163,9 @@ public class CreateRandomTree {
     }
 
     public static void traverseTree(Node root) {
-        System.out.print(root.L + "(" + root.xpos + "," + root.ypos + ")" + "->");
+        System.out.print(root.L + "(" + root.AL + "," + root.UL + ")" + "->");
         for (Node c : root.C) {
-            System.out.print(c.L + "(" + c.xpos + "," + c.ypos + ")" + " ");
+            System.out.print(c.L + "(" + c.AL + "," + c.UL + ")" + " ");
         }
         for (User u : root.U) {
             if (!u.isLegit) {
@@ -220,6 +220,7 @@ public class CreateRandomTree {
         return hasloop;
     }
 
+ 
     private static void StartRouting(Node root) {
 
         new RoutingThread(root);

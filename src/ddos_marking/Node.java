@@ -196,7 +196,7 @@ public class Node {
 
     private void ProcessByVictim(Packet P) throws FileNotFoundException, IOException {
         packet_count++;
-        if ((System.currentTimeMillis() - systime3) > 50000) {
+        if ((System.currentTimeMillis() - systime3) > 100000) {
             fw.flush();
             fw.close();
             System.exit(0);
@@ -285,7 +285,7 @@ public class Node {
             Node root2 = Helper.PathsToTree(Paths);
             if (!CreateRandomTree.hasLoop(root2) && root2 != null) {
                 System.out.println("Printing tree after " + AttackCount + " " + LegitCount);
-                CreateRandomTree.PrintTree(root2);
+
                 Optimization OP = new Optimization(root2);
                 OP.PrintN();
                 OP.CalculateLCA();
@@ -293,8 +293,11 @@ public class Node {
                 //  OP.PrintD();
                 OP.ComputeAL(AttackCount);
                 OP.ComputeUL(LegitCount);
+                CreateRandomTree.PrintTree(root2);
+                //  ArrayList<Integer> g = OP.FindAssignment(30);
+                OP.CalculateDP(3);
 
-                ArrayList<Integer> g = OP.FindAssignment(30);
+                ArrayList<Integer> g = OP.FindDPAssignment(3);
                 System.out.println("optimal assignment: " + g.toString());
 
                 ArrayList<Node> N = new ArrayList<Node>();

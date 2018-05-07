@@ -40,6 +40,7 @@ public class Node {
     public double UL = 0;
 
     boolean isFilterActivated = false;
+    boolean isDestFilterActivated = false;
     HashSet<Integer> BlockList;
 
     static int Total_APF_Count = 0;
@@ -143,7 +144,8 @@ public class Node {
 //            Node.incBAP();
 //            return true;
 //        }
-        if (isFilterActivated && BlockList.contains(P.Src)) {
+        if (isDestFilterActivated || (isFilterActivated && BlockList.contains(P.Src))) {
+         //   System.out.println("blocked");
             if (!P.isLegit) {
                 Node.incBAP();
             } else {
@@ -196,7 +198,7 @@ public class Node {
 
     private void ProcessByVictim(Packet P) throws FileNotFoundException, IOException {
         packet_count++;
-        if ((System.currentTimeMillis() - systime3) > 100000) {
+        if ((System.currentTimeMillis() - systime3) > SYSTEM_VARIABLE.SIMULATION_TIME) {
             fw.flush();
             fw.close();
             System.exit(0);
@@ -242,7 +244,7 @@ public class Node {
             markadd(pair, mark);
 
         }
-        if ((System.currentTimeMillis() - systime) > 500) {
+        if ((System.currentTimeMillis() - systime) > SYSTEM_VARIABLE.PATHUPDATE_INTERVAL) {
 
             systime = System.currentTimeMillis();
 
@@ -279,10 +281,11 @@ public class Node {
             //  LegitCount.clear();
         }
 
-        if ((System.currentTimeMillis() - systime2) > 1000 && !assigned) {
+        if ((System.currentTimeMillis() - systime2) > SYSTEM_VARIABLE.ASSIGNMENT_INTERVAL) {
             systime2 = System.currentTimeMillis();
 
             Node root2 = Helper.PathsToTree(Paths);
+           // root2=CreateRandomTree.ROOT;
             if (!CreateRandomTree.hasLoop(root2) && root2 != null) {
                 System.out.println("Printing tree after " + AttackCount + " " + LegitCount);
 
@@ -294,10 +297,11 @@ public class Node {
                 OP.ComputeAL(AttackCount);
                 OP.ComputeUL(LegitCount);
                 CreateRandomTree.PrintTree(root2);
-                //  ArrayList<Integer> g = OP.FindAssignment(30);
-                OP.CalculateDP(3);
 
-                ArrayList<Integer> g = OP.FindDPAssignment(3);
+                 //ArrayList<Integer> g = OP.FindAssignment(SYSTEM_VARIABLE.B);
+                 ArrayList<Integer> g = OP.NaiveAssignment(SYSTEM_VARIABLE.B);
+                //OP.CalculateDP(SYSTEM_VARIABLE.B);
+                //ArrayList<Integer> g = OP.FindDPAssignment(SYSTEM_VARIABLE.B);
                 System.out.println("optimal assignment: " + g.toString());
 
                 ArrayList<Node> N = new ArrayList<Node>();

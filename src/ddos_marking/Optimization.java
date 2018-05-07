@@ -51,8 +51,6 @@ public class Optimization {
         CalculateD(root, 0);
 
         L = new double[Math.max(this.N, MaxL + 1)];
-        A = new double[Math.max(this.N, MaxL + 1)][Math.max(this.N, MaxL + 1)];
-        R = new int[Math.max(this.N, MaxL + 1)][Math.max(this.N, MaxL + 1)][SYSTEM_VARIABLE.RANDOM_TREE_MAXDEGREE + 1];
 
     }
 
@@ -205,8 +203,10 @@ public class Optimization {
 
     public void CalculateDP(int B) {
 
-        System.out.println("dp calculating");
+        //  System.out.println("dp calculating");
         R2 = new Object[Math.max(this.N, MaxL + 1)][B + 1];
+        A = new double[Math.max(this.N, MaxL + 1)][B + 1];
+        R = new int[Math.max(this.N, MaxL + 1)][B + 1][SYSTEM_VARIABLE.RANDOM_TREE_MAXDEGREE + 1];
 
         for (int i = NodesTopToButtom.size() - 1; i >= 0; i--) {
             NodesButtomToTop.add(NodesTopToButtom.get(i));
@@ -219,7 +219,7 @@ public class Optimization {
                 if (n.C.size() == 0) // leaf node
                 {
                     L[I] = n.UL;
-                    A[I][j] = OMEGA * n.AL + (1 - OMEGA) * n.UL;
+                    A[I][j] = (1 - OMEGA) * n.UL;
                     for (int k = 0; k < (RANDOM_TREE_MAXDEGREE + 1); k++) {
                         R[I][j][k] = 0;
 
@@ -230,59 +230,22 @@ public class Optimization {
                     if ((j == 0) && (n.AL <= 0)) {
                         A[I][j] = 0.0;
                     }
-                    System.out.println(I + "-" + j + ":" + A[I][j]);
+                    //  System.out.println(I + "-" + j + ":" + A[I][j]);
 
                     R[I][j][RANDOM_TREE_MAXDEGREE] = j;
                 } else// non leaf nodes
                 {
 
-                    double min_cost = 1000000000.0;
-
-                    //option 1
-                    //  System.out.println("option 1");
-                    for (int k1 = j; k1 >= 0; k1--) {
-                        for (int k2 = j; k2 >= 0; k2--) {
-                            for (int k3 = j; k3 >= 0; k3--) {
-                                for (int k4 = j; k4 >= 0; k4--) {
-                                    if ((k1 + k2 + k3 + k4) == j) {
-                                        double p = 0;
-                                        if (n.C.size() > 0) {
-                                            p += A[n.C.get(0).L][k1];
-                                            System.out.println("first " + I);
-                                        }
-                                        if (n.C.size() > 1) {
-                                            p += A[n.C.get(1).L][k2];
-                                            System.out.println("2nd " + I);
-                                        }
-                                        if (n.C.size() > 2) {
-                                            p += A[n.C.get(2).L][k3];
-                                            System.out.println("3rd " + I);
-                                        }
-                                        if (n.C.size() > 3) {
-                                            p += A[n.C.get(3).L][k4];
-                                            System.out.println("4th " + I);
-                                        }
-                                        if (p < min_cost) {
-                                            min_cost = p;
-                                            R[I][j][0] = k1;
-                                            R[I][j][1] = k2;
-                                            R[I][j][2] = k3;
-                                            R[I][j][3] = k4;
-                                            R[I][j][4] = 0;
-                                            System.out.println("option 1 cost:" + p);
-                                            A[I][j] = min_cost;
-                                        }
-
-                                    }
-                                }
-                            }
-                        }
+                    for (Node c : n.C) {
+                        L[n.L] += L[c.L];
                     }
-                    // System.out.println("option 2");
+                    L[n.L] += n.UL;
+                    double min_cost = 1000000000.0;
                     //option 2
                     double p1 = findOptimalAssignmentWithOoutBlock(n, j);
-                    //System.out.println("p1 found");
+
                     double p2 = L[n.L];
+                    //System.out.println("(" + I + "," + j + ")" + "p1:" + p1 + "p2:" + p2);
                     double p = OMEGA * p1 + (1 - OMEGA) * p2;
                     if (p < min_cost) {
                         min_cost = p;
@@ -293,14 +256,59 @@ public class Optimization {
                         R[I][j][4] = j;
                         A[I][j] = min_cost;
                     }
+                    //option 1
+                    //  System.out.println("option 1");
+
+                    if (n.AL == 0) {
+                        for (int k1 = j; k1 >= 0; k1--) {
+                            for (int k2 = j; k2 >= 0; k2--) {
+                                for (int k3 = j; k3 >= 0; k3--) {
+                                    for (int k4 = j; k4 >= 0; k4--) {
+                                        if ((k1 + k2 + k3 + k4) == j) {
+                                            p = 0;
+                                            if (n.C.size() > 0) {
+                                                p += A[n.C.get(0).L][k1];
+                                                //  System.out.println("first " + I);
+                                            }
+                                            if (n.C.size() > 1) {
+                                                p += A[n.C.get(1).L][k2];
+                                                //System.out.println("2nd " + I);
+                                            }
+                                            if (n.C.size() > 2) {
+                                                p += A[n.C.get(2).L][k3];
+                                                //  System.out.println("3rd " + I);
+                                            }
+                                            if (n.C.size() > 3) {
+                                                p += A[n.C.get(3).L][k4];
+                                                //    System.out.println("4th " + I);
+                                            }
+                                            if (p < min_cost) {
+                                                min_cost = p;
+                                                R[I][j][0] = k1;
+                                                R[I][j][1] = k2;
+                                                R[I][j][2] = k3;
+                                                R[I][j][3] = k4;
+                                                R[I][j][4] = 0;
+                                                //   System.out.println("option 1 cost:" + p);
+                                                A[I][j] = min_cost;
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // System.out.println("option 2");
+
                 }
             }
         }
-        System.out.println("dp calculating done");
-        System.out.println("A");
-        printA();
-        System.out.println("R");
-        printR();
+//        System.out.println("dp calculating done");
+//        System.out.println("A");
+//        printA();
+//        System.out.println("R");
+//        printR();
     }
 
     private ArrayList<Node> getButtomUPNodes(Node root) {
@@ -314,7 +322,6 @@ public class Optimization {
 
         while (!N.isEmpty()) {
             Node n = N.remove(0);
-
             NN.add(n);
             N.addAll(n.C);
             // System.out.println(n.L);
@@ -327,36 +334,51 @@ public class Optimization {
         return R;
     }
 
-    int findMAX(double[] A) {
+    int findMAX(HashMap<Integer, Double> A, ArrayList<Integer> g) {
         double max = Double.MIN_VALUE;
-        int max_i = 0;
-        for (int i = 0; i < A.length; i++) {
-            if (max < A[i]) {
-                max = A[i];
+        int max_i = -1;
+        for (int i : A.keySet()) {
+            double b = A.get(i);
+            if ((max < b) && (g.indexOf(i) < 0)) {
+                max = b;
                 max_i = i;
             }
         }
         return max_i;
     }
 
+    void PrintBenefit(HashMap<Integer, Double> A) {
+        for (int i : A.keySet()) {
+            double b = A.get(i);
+            System.out.print(i + "-" + b + ", ");
+        }
+        System.out.println("");
+    }
+
     private double findOptimalAssignmentWithOoutBlock(Node root, int j) {
-        // System.out.println("find op ass called at N:" + root.L + " B:" + j);
+        //  System.out.println("find op ass called at N:" + root.L + " B:" + j);
 
         ArrayList<Node> NODES = getButtomUPNodes(root);
-        // System.out.println("buttom up nodes: " + NODES);
+//        System.out.println("buttom up nodes: ");
+//
+//        for (Node n : NODES) {
+//            System.out.print(n.L + " ");
+//        }
+//        System.out.println("******");
         ArrayList<Integer> g = new ArrayList<Integer>();
-        double[] BENEFIT = new double[MaxL + 1];
-        for (int i = 0; i < BENEFIT.length; i++) {
-            BENEFIT[i] = Double.MIN_VALUE;
+        HashMap<Integer, Double> BENEFIT = new HashMap<Integer, Double>();
+        for (Node n : NODES) {
+            BENEFIT.put(n.L, Double.MIN_VALUE);
         }
         for (Node n : NODES) {
             n.BAT = n.AL;
             for (Node c : n.C) {
                 n.BAT += c.BAT;
             }
-            BENEFIT[n.L] = n.BAT * (D[n.L] - D[root.L]);
-
+            //  System.out.print(n.L + "(" + n.BAT + ")");
+            BENEFIT.put(n.L, n.BAT * (D[n.L] - D[root.L]));
         }
+        // System.out.println("");
         double cost = 0;
         for (Node n : NODES) {
             if (n.AL > 0) {
@@ -365,16 +387,28 @@ public class Optimization {
         }
 
         double benefit = 0;
-        while (g.size() < (j - 1)) {
+        g.add(root.L);
+        int size = 1;
+        // PrintBenefit(BENEFIT);
+        while (size < (j - 1)) {
             //   System.out.println("in while g:" + g.toString());
-            int a = findMAX(BENEFIT);
-            BENEFIT[a] = Double.MIN_VALUE;
-            benefit += a;
-            reduceBAT(Nodes.get(a), root, g);
-            g.add(a);
-            for (Node n : NODES) {
-                BENEFIT[n.L] = calculateDistance(n, root, g) * n.BAT;
+            int a = findMAX(BENEFIT, g);
+            if (a != -1) {
+                double b = BENEFIT.remove(a);
+
+                reduceBAT(Nodes.get(a), root, g);
+
+                g.add(a);
+                benefit += b;
+
+                for (Node n : NODES) {
+                    Double new_b = calculateDistance(n, root, g) * n.BAT;
+                    BENEFIT.put(n.L, new_b);
+                }
+                //      PrintBenefit(BENEFIT);
             }
+            size++;
+
         }
 
         //  System.out.println("g" + g.toString());
@@ -382,13 +416,15 @@ public class Optimization {
         // System.out.println("benefit: " + benefit + " cost:" + cost + " return:" + (cost - benefit));
         if ((j == 0) && (root.BAT > 0)) {
 
+            g.clear();
             return 10000000.0;
         }
 
         if ((j == 1) && (root.BAT > 0)) {
-            g.add(root.L);
+
             return cost;
         }
+
         return cost - benefit;
     }
 
@@ -442,16 +478,16 @@ public class Optimization {
         while (!AsTsk.isEmpty()) {
             AssTask a = AsTsk.remove(0);
 
-            System.out.println("Loopup Node:" + a.N.L + " B:" + a.B);
+            //  System.out.println("Loopup Node:" + a.N.L + " B:" + a.B);
             if (R[a.N.L][a.B][RANDOM_TREE_MAXDEGREE] > 0) {
                 ArrayList<Integer> gx = (ArrayList<Integer>) R2[a.N.L][a.B];
                 if (gx != null) {
 
-                    System.out.println("added to g: " + gx.toString());
+                    //    System.out.println("added to g: " + gx.toString());
                 } else {
                     findOptimalAssignmentWithOoutBlock(a.N, a.B);
                     gx = (ArrayList<Integer>) R2[a.N.L][a.B];
-                    System.out.println("null non bloock assignment: " + a.N.L + " B:" + a.B);
+                    //   System.out.println("null non bloock assignment: " + a.N.L + " B:" + a.B);
                 }
                 g.addAll(gx);
             } else {
@@ -505,7 +541,7 @@ public class Optimization {
         for (int i = 0; i < R.length; i++) {
             for (int j = 0; j < R[i].length; j++) {
 
-                System.out.print("[");
+                System.out.print("(" + i + "," + j + ")[");
                 for (int k = 0; k < R[i][j].length; k++) {
 
                     System.out.print(R[i][j][k] + " ");
@@ -515,6 +551,47 @@ public class Optimization {
             }
             System.out.println("");
         }
+    }
+
+    public ArrayList<Integer> NaiveAssignment(int B) {
+
+        ArrayList<Node> NODES = getButtomUPNodes(root);
+        for (Node n : NODES) {
+            n.BAT = n.AL;
+            for (Node c : n.C) {
+                n.BAT += c.BAT;
+            }
+        }
+        ArrayList<Node> CA = new ArrayList<Node>();
+        CA.add(root);
+        int size = CA.size();
+        while (size < B) {
+            double max_BAT = Double.MIN_VALUE;
+            int max_i = -1;
+            for (int i = 0; i < CA.size(); i++) {
+                Node n = CA.get(i);
+                if (max_BAT < n.BAT) {
+                    max_BAT = n.BAT;
+                    max_i = i;
+                }
+
+            }
+            if (max_i >= 0) {
+                Node removed = CA.remove(max_i);
+                removed.BAT = -1;
+                if (removed.AL > 0) {
+                    CA.add(removed);
+                }
+                CA.addAll(removed.C);
+
+            }
+            size = Math.max(size + 1, CA.size());
+        }
+        ArrayList<Integer> g = new ArrayList<Integer>();
+        for (Node n : CA) {
+            g.add(n.L);
+        }
+        return g;
     }
 
 }

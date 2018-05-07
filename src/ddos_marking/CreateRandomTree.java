@@ -149,17 +149,42 @@ public class CreateRandomTree {
     }
 
     public static void CreateUser(Node n) {
-        int numbe_of_user = (int) (Math.random() * 4 + 1);
-        for (int i = 0; i < numbe_of_user; i++) {
-            boolean islegit = true;
+        int numbe_of_user = (int) (Math.random() * 6 + 1);
 
-            if (Math.random() < ATTACKER_RATIO) {
-                islegit = false;
+        int Case = (int) (Math.random() * 100) % 3;
+
+        if (Case == 0) {
+            //all white
+            for (int i = 0; i < numbe_of_user * (1 - ATTACKER_RATIO); i++) {
+                boolean islegit = true;
+                double datarate = (Math.random() * 100) % MAX_DATARATE + 1;
+                User u = new User(islegit, datarate);
+                n.U.add(u);
             }
-            double datarate = (Math.random() * 100) % MAX_DATARATE + 1;
-            User u = new User(islegit, datarate);
-            n.U.add(u);
         }
+        if (Case == 1) {
+            //all black
+            for (int i = 0; i < numbe_of_user * (ATTACKER_RATIO); i++) {
+                boolean islegit = false;
+                double datarate = (Math.random() * 100) % MAX_DATARATE + 1;
+                User u = new User(islegit, datarate);
+                n.U.add(u);
+            }
+        }
+        if (Case == 2) {
+            //mixed
+            for (int i = 0; i < numbe_of_user; i++) {
+                boolean islegit = true;
+
+                if (Math.random() < ATTACKER_RATIO) {
+                    islegit = true;
+                }
+                double datarate = (Math.random() * 100) % MAX_DATARATE + 1;
+                User u = new User(islegit, datarate);
+                n.U.add(u);
+            }
+        }
+
     }
 
     public static void traverseTree(Node root) {
@@ -220,7 +245,6 @@ public class CreateRandomTree {
         return hasloop;
     }
 
- 
     private static void StartRouting(Node root) {
 
         new RoutingThread(root);

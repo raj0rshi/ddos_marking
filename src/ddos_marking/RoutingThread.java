@@ -34,7 +34,7 @@ public class RoutingThread implements Runnable {
                     for (User u : N.getU()) {
                         for (int i = 0; i < 1; i++) {
                             Packet p = new Packet(u.isLegit, N.L, V);
-                       //     System.out.println("packet generated at node:" + N.L);
+                            //System.out.println("packet generated at node:" + N.L);
                             N.insert(p);
                         }
                     }

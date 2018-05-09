@@ -42,15 +42,16 @@ public class Node {
     boolean isFilterActivated = false;
     boolean isDestFilterActivated = false;
     HashSet<Integer> BlockList;
-
-    static int Total_APF_Count = 0;
-    static int Total_LP_Count = 0;
-    static int Total_BAP_Count = 0;
-    static int Total_BLU_Count = 0;
-    static int Total_AP_Count = 0;
+    static volatile double Total_PACKET = 0;
+    static volatile int Total_APF_Count = 0;
+    static volatile int Total_LP_Count = 0;
+    static volatile int Total_BAP_Count = 0;
+    static volatile int Total_BLU_Count = 0;
+    static volatile int Total_AP_Count = 0;
     //for optimization
     double BAT = 0;
     HashMap<Integer, Integer> CD;
+    static ArrayList<Integer> g = null;
 
     public Node(int L) {
         this.L = L;
@@ -92,19 +93,23 @@ public class Node {
         BlockList.clear();
     }
 
-    public static synchronized void incAPC() {
+    public static void incAPC() {
         Total_APF_Count++;
     }
 
-    public static synchronized void incBAP() {
+    public static void incTPC() {
+        Total_PACKET++;
+    }
+
+    public static void incBAP() {
         Total_BAP_Count++;
     }
 
-    public static synchronized void incLPC() {
+    public static void incLPC() {
         Total_LP_Count++;
     }
 
-    public static synchronized void incBLPC() {
+    public static void incBLPC() {
         Total_BLU_Count++;
     }
 
@@ -117,16 +122,29 @@ public class Node {
     }
 
     public synchronized void insert(Packet P) {
-        if (this.MQ.size() > 1000) {
+        if (this.MQ.size() > 10000) {
             System.out.println("packed dropped");
             return;
         }
+
         if (!P.isLegit) {
             Node.incAPC();
         }
+
         this.MQ.add(P);
         synchronized (this.T) {
-            this.T.notifyAll();
+            this.T.notify();
+        }
+    }
+
+    public synchronized void insert2(Packet P) {
+        if (this.MQ.size() > 10000) {
+            System.out.println("packed dropped");
+            return;
+        }
+        this.MQ.add(P);
+        synchronized (this.T) {
+            this.T.notify();
         }
     }
 
@@ -136,6 +154,7 @@ public class Node {
         if (MQ.isEmpty()) {
             return false;
         }
+
         Packet P = MQ.get(0);
         MQ.remove(0);
 
@@ -145,7 +164,7 @@ public class Node {
 //            return true;
 //        }
         if (isDestFilterActivated || (isFilterActivated && BlockList.contains(P.Src))) {
-         //   System.out.println("blocked");
+            //   System.out.println("blocked");
             if (!P.isLegit) {
                 Node.incBAP();
             } else {
@@ -193,7 +212,7 @@ public class Node {
     long starttime = System.currentTimeMillis();
     boolean flag = true;
     boolean assigned = false;
-    static File f = new File("output.csv");
+    static File f = new File("P" + SYSTEM_VARIABLE.ASSIGNMENT_POLICY + "-B" + SYSTEM_VARIABLE.B + "-MP" + SYSTEM_VARIABLE.MARKING_PROBABILITY + "-" + SYSTEM_VARIABLE.file + "-output.csv");
     static FileWriter fw;
 
     private void ProcessByVictim(Packet P) throws FileNotFoundException, IOException {
@@ -201,6 +220,7 @@ public class Node {
         if ((System.currentTimeMillis() - systime3) > SYSTEM_VARIABLE.SIMULATION_TIME) {
             fw.flush();
             fw.close();
+            FormatOutput.main(f);
             System.exit(0);
         }
 
@@ -247,62 +267,43 @@ public class Node {
         if ((System.currentTimeMillis() - systime) > SYSTEM_VARIABLE.PATHUPDATE_INTERVAL) {
 
             systime = System.currentTimeMillis();
-
-            //FileWriter fw = new FileWriter(f, true);
-            if (flag) {
-                flag = false;
-                fw.append("Time,\t Total Cost,\tTotal Received Attack Packet,\t Total Blocked  Attack Packet,\tTotal Legit Packt,\t Total Blocked Legit Packet\n");
-            }
-
-            //            System.out.print("Path to " + P.Src + ": ");
             ArrayList<Integer> path = Helper.PairToPath(Marks.get(P.Src));
             Paths.put(P.Src, path);
-            System.out.println("Time:" + (System.currentTimeMillis() - systime2));
-            System.out.println("Total Cost:" + Total_APF_Count);
-            System.out.println("Total Received Attack Packet :" + Total_AP_Count);
-            System.out.println("Total Blocked  Attack Packet:" + Total_BAP_Count);
-            System.out.println("Total Legit Packt:" + Total_LP_Count);
-            System.out.println("Total Blocked Legit Packet:" + Total_BLU_Count);
-            fw.append((System.currentTimeMillis() - starttime) + ",\t");
-            fw.append(Total_APF_Count + ",\t");
-            fw.append(Total_AP_Count + ",\t");
-            fw.append(Total_BAP_Count + ",\t");
-            fw.append(Total_LP_Count + ",\t");
-            fw.append(Total_BLU_Count + ",\t");
-            fw.append("\n");
-
-            //refresh counts
-            Total_APF_Count = 0;
-            Total_AP_Count = 0;
-            Total_BAP_Count = 0;
-            Total_LP_Count = 0;
-            Total_BLU_Count = 0;
+            //FileWriter fw = new FileWriter(f, true);
             //   AttackCount.clear();
             //  LegitCount.clear();
         }
 
-        if ((System.currentTimeMillis() - systime2) > SYSTEM_VARIABLE.ASSIGNMENT_INTERVAL) {
+        if (((System.currentTimeMillis() - systime2) > SYSTEM_VARIABLE.ASSIGNMENT_INTERVAL)) {
             systime2 = System.currentTimeMillis();
 
             Node root2 = Helper.PathsToTree(Paths);
-           // root2=CreateRandomTree.ROOT;
+            if (SYSTEM_VARIABLE.KNOWS_TOPOLOGY) {
+                root2 = CreateRandomTree.ROOT;
+            }
             if (!CreateRandomTree.hasLoop(root2) && root2 != null) {
-                System.out.println("Printing tree after " + AttackCount + " " + LegitCount);
+                // System.out.println("Printing tree after " + AttackCount + " " + LegitCount);
 
-                Optimization OP = new Optimization(root2);
-                OP.PrintN();
-                OP.CalculateLCA();
+                Optimization1 OP = new Optimization1(root2);
+                //  OP.PrintN();
+                // OP.CalculateLCA();
                 //  OP.PrintLCA();
                 //  OP.PrintD();
                 OP.ComputeAL(AttackCount);
                 OP.ComputeUL(LegitCount);
-                CreateRandomTree.PrintTree(root2);
+                // CreateRandomTree.PrintTree(root2);
 
-                 //ArrayList<Integer> g = OP.FindAssignment(SYSTEM_VARIABLE.B);
-                 ArrayList<Integer> g = OP.NaiveAssignment(SYSTEM_VARIABLE.B);
-                //OP.CalculateDP(SYSTEM_VARIABLE.B);
-                //ArrayList<Integer> g = OP.FindDPAssignment(SYSTEM_VARIABLE.B);
-                System.out.println("optimal assignment: " + g.toString());
+                if (SYSTEM_VARIABLE.ASSIGNMENT_POLICY == 1) {
+                    g = OP.FindAssignment(SYSTEM_VARIABLE.B);
+                }
+                if (SYSTEM_VARIABLE.ASSIGNMENT_POLICY == 2) {
+                   // OP.CalculateDP(SYSTEM_VARIABLE.B);
+                    g = OP.FindDPAssignment(SYSTEM_VARIABLE.B);
+                }
+                if (SYSTEM_VARIABLE.ASSIGNMENT_POLICY == 3) {
+                    g = OP.NaiveAssignment(SYSTEM_VARIABLE.B);
+                }
+                //  System.out.println("optimal assignment: " + g.toString());
 
                 ArrayList<Node> N = new ArrayList<Node>();
                 N.add(CreateRandomTree.ROOT);
@@ -310,15 +311,22 @@ public class Node {
                     Node n = N.remove(0);
                     N.addAll(n.C);
                     //  System.out.println(n.L + "-U:" + n.U.size());
-                    if (g.contains(n.L)) {
+                    if (g != null && g.contains(n.L)) {
                         for (int BIP : AttackCount.keySet()) {
                             n.addBlockList(BIP);
                             //System.out.println("added:" + BIP);
                         }
                         n.isFilterActivated = true;
+                        if (SYSTEM_VARIABLE.ASSIGNMENT_POLICY == 2) {
+                            n.isDestFilterActivated = true;
+                        }
                     } else {
 
+                        n.BlockList.clear();
                         n.isFilterActivated = false;
+                        if (SYSTEM_VARIABLE.ASSIGNMENT_POLICY == 2) {
+                            n.isDestFilterActivated = false;
+                        }
                     }
                 }
                 // System.out.println("done1");
@@ -330,5 +338,68 @@ public class Node {
             // System.out.println("done");
         }
     }
+    int lessLUCount = 0;
+
+    public void log() throws IOException {
+
+        if (flag) {
+            flag = false;
+            fw.append("Time,\t Total Cost,\tTotal Received Attack Packet,\t Total Blocked  Attack Packet,\tTotal Legit Packt,\t Total Blocked Legit Packet,\tfilter used\n");
+        } //            System.out.print("Path to " + P.Src + ": ");
+        System.out.println("P" + SYSTEM_VARIABLE.ASSIGNMENT_POLICY + " ->Time:" + (System.currentTimeMillis() - starttime));
+        System.out.println("Total Cost:" + Total_APF_Count / (Total_BAP_Count + 0.01));
+        System.out.println("Total Received Attack Packet :" + Total_AP_Count);
+        System.out.println("Total Blocked  Attack Packet:" + Total_BAP_Count);
+        System.out.println("Total Legit Packt:" + Total_LP_Count);
+        System.out.println("Total Blocked Legit Packet:" + Total_BLU_Count);
+        int filter_used = 0;
+        if (g != null) {
+            System.out.println("Filter Used:" + g.size() + g);
+            filter_used = g.size();
+        } else {
+            System.out.println("Filter Used: -");
+        }
+        fw.append((System.currentTimeMillis() - starttime) + ",\t");
+        fw.append(Total_APF_Count / (Total_BAP_Count + 0.01) + ",\t");
+        fw.append(Total_AP_Count + ",\t");
+        fw.append(Total_BAP_Count + ",\t");
+        fw.append(Total_LP_Count + ",\t");
+        fw.append(Total_BLU_Count + ",\t");
+        fw.append(filter_used + ",\t");
+        fw.append("\n");
+
+        //clear assignment
+        if (false && (Total_LP_Count < 700) && (SYSTEM_VARIABLE.ASSIGNMENT_POLICY == 2)) {
+
+            lessLUCount++;
+            if (lessLUCount > 5) {
+
+                lessLUCount = 0;
+                System.out.println("filter cleared");
+                ArrayList<Node> N = new ArrayList<Node>();
+                N.add(CreateRandomTree.ROOT);
+                while (!N.isEmpty()) {
+                    Node n = N.remove(0);
+                    N.addAll(n.C);
+                    n.isDestFilterActivated = false;
+                    n.isFilterActivated = false;
+                    n.BlockList.clear();
+                }
+            }
+        } else {
+            lessLUCount = 0;
+        }
+
+        //      refresh counts
+        Total_APF_Count = 0;
+        Total_AP_Count = 0;
+        Total_BAP_Count = 0;
+        Total_LP_Count = 0;
+        Total_BLU_Count = 0;
+        Total_PACKET = 0;
+        round++;
+    }
+
+    static volatile int round = 1;
 
 }

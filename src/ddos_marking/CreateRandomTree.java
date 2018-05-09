@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -26,16 +28,45 @@ public class CreateRandomTree {
 
     public static void main(String[] args) throws IOException {
 //        ROOT = new Node(label);
-//        CreateSubtree(RANDOM_TREE_MAXHEIGHT, RANDOM_TREE_MAXDEGREE+1, ROOT);
+//        CreateSubtree(RANDOM_TREE_MAXHEIGHT, RANDOM_TREE_MAXDEGREE, ROOT);
 //        ddos_marking.graphics.DisplaySimpleTree.DrawTree(ROOT);
-//
 //        saveSubtree(ROOT, SYSTEM_VARIABLE.file);
-        ROOT = readSubtree(SYSTEM_VARIABLE.file);
-        traverseTree(ROOT);
-        ddos_marking.graphics.DisplaySimpleTree.DrawTree(ROOT);
+//        Scanner scn = new Scanner(System.in);
+//        scn.nextByte();
+//        System.exit(0);
 
+        if (args.length > 0) {
+            SYSTEM_VARIABLE.ASSIGNMENT_POLICY = Long.parseLong(args[0]);
+        }
+        if (args.length > 1) {
+            SYSTEM_VARIABLE.B = Integer.parseInt(args[1]);
+        }
+        System.out.println("Starting Problem " + SYSTEM_VARIABLE.ASSIGNMENT_POLICY);
+        
+        //SYSTEM_VARIABLE.file = "tree2.txt";
+        ROOT = readSubtree(SYSTEM_VARIABLE.file);
+//      
+////        Optimization1 OP = new Optimization1(ROOT);
+////        System.out.println(OP.FindDPAssignment(30));
+//        ddos_marking.graphics.DisplaySimpleTree.DrawTree(ROOT);
+        traverseTree(ROOT);
         StartRouting(ROOT);
 
+        Thread T = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    while (true) {
+                        ROOT.log();
+                        Thread.sleep(SYSTEM_VARIABLE.LOG_INTERVAL);
+                    }
+                } catch (Exception ex) {
+                    Logger.getLogger(CreateRandomTree.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+        T.start();
+//
     }
 
     public static Node readSubtree(String filename) throws IOException {
@@ -135,6 +166,9 @@ public class CreateRandomTree {
         }
 
         int deg = (int) (Math.random() * 100 % degree);
+        if (deg > 0) {
+            deg++;
+        }
         for (int c = 0; c < deg; c++) {
             Node n = new Node(++label);
             N.C.add(n);
@@ -155,7 +189,7 @@ public class CreateRandomTree {
 
         if (Case == 0) {
             //all white
-            for (int i = 0; i < numbe_of_user * (1 - ATTACKER_RATIO); i++) {
+            for (int i = 0; i < numbe_of_user; i++) {
                 boolean islegit = true;
                 double datarate = (Math.random() * 100) % MAX_DATARATE + 1;
                 User u = new User(islegit, datarate);
@@ -164,7 +198,7 @@ public class CreateRandomTree {
         }
         if (Case == 1) {
             //all black
-            for (int i = 0; i < numbe_of_user * (ATTACKER_RATIO); i++) {
+            for (int i = 0; i < numbe_of_user; i++) {
                 boolean islegit = false;
                 double datarate = (Math.random() * 100) % MAX_DATARATE + 1;
                 User u = new User(islegit, datarate);
@@ -177,6 +211,8 @@ public class CreateRandomTree {
                 boolean islegit = true;
 
                 if (Math.random() < ATTACKER_RATIO) {
+                    islegit = false;
+                } else {
                     islegit = true;
                 }
                 double datarate = (Math.random() * 100) % MAX_DATARATE + 1;
@@ -252,6 +288,10 @@ public class CreateRandomTree {
             StartRouting(c);
         }
 
+    }
+
+    public static Node CreateTreeFromRealData() {
+        return null;
     }
 
 }

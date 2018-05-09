@@ -1,0 +1,1 @@
+java -jar dist/DDOS_MARKING.jar 2

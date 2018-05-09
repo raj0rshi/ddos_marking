@@ -1,0 +1,60 @@
+P1:
+Total Cost:36421
+Total Received Attack Packet :0
+Total Blocked  Attack Packet:13038
+Total Legit Packt:10457
+Total Blocked Legit Packet:4305
+Filter Used:30
+Time:337555
+
+P2:
+Total Cost:37915
+Total Received Attack Packet :3148
+Total Blocked  Attack Packet:9824
+Total Legit Packt:7481
+Total Blocked Legit Packet:7022
+Filter Used:30
+Time:58515
+P3:
+Total Cost:40014
+Total Received Attack Packet :1371
+Total Blocked  Attack Packet:11678
+Total Legit Packt:10818
+Total Blocked Legit Packet:3874
+Filter Used:28
+Time:66618
+
+P1
+Total Cost:48008
+Total Received Attack Packet :0
+Total Blocked  Attack Packet:12860
+Total Legit Packt:10292
+Total Blocked Legit Packet:4225
+Filter Used:20
+Time:123368
+
+P2
+Time:115205
+Total Cost:46221
+Total Received Attack Packet :3266
+Total Blocked  Attack Packet:10153
+Total Legit Packt:4473
+Total Blocked Legit Packet:10650
+Filter Used:20
+
+P3
+Total Cost:43531
+Total Received Attack Packet :0
+Total Blocked  Attack Packet:13207
+Total Legit Packt:10533
+Total Blocked Legit Packet:4321
+Filter Used:18
+Time:88918
+
+P1
+Total Cost:75968
+Total Received Attack Packet :0
+Total Blocked  Attack Packet:12927
+Total Legit Packt:10317
+Total Blocked Legit Packet:4228
+Filter Used:5

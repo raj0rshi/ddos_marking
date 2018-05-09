@@ -25,22 +25,23 @@ public class RoutingThread implements Runnable {
         N.T = T;
         T.start();
 
-       // System.out.println("routing started at node: " + N.L + " with mp=" + N.mp);
+        // System.out.println("routing started at node: " + N.L + " with mp=" + N.mp);
         Thread UT = new Thread(new Runnable() {
             @Override
             public void run() {
                 while (true) {
-                 //   System.out.println("Users at node "+N.L +" : "+ N.U.size());
+                    //   System.out.println("Users at node "+N.L +" : "+ N.U.size());
                     for (User u : N.getU()) {
                         for (int i = 0; i < 1; i++) {
                             Packet p = new Packet(u.isLegit, N.L, V);
+                            if(!p.isLegit)Node.incTPC();
                             //System.out.println("packet generated at node:" + N.L);
-                            N.insert(p);
+                            N.insert2(p);
                         }
                     }
                     try {
-                       // System.out.println("packet generator sleeping at node :" + N.L);
-                        Thread.sleep((int)(Math.random()*10));
+                        // System.out.println("packet generator sleeping at node :" + N.L);
+                        Thread.sleep((int) (10));
                         // System.out.println("packet generator waking up at node :" + N.L);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(RoutingThread.class.getName()).log(Level.SEVERE, null, ex);
@@ -63,13 +64,12 @@ public class RoutingThread implements Runnable {
 
                 } else {
                     try {
-                        synchronized (T) {
+                        synchronized (this.T) {
                             //System.out.println("router " + N.L + " sleeping");
-                           T.wait();
-                           
-                           
-                           // System.out.println("router " + N.L + " is waking up");
+                            T.wait();
+                            //  Thread.sleep(10);
 
+                            // System.out.println("router " + N.L + " is waking up");
                         }
                     } catch (InterruptedException ex) {
                         Logger.getLogger(RoutingThread.class.getName()).log(Level.SEVERE, null, ex);

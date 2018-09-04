@@ -28,7 +28,7 @@ public class CreateRandomTree {
 
     public static void main(String[] args) throws IOException {
 //        ROOT = new Node(label);
-//        CreateSubtree(RANDOM_TREE_MAXHEIGHT, RANDOM_TREE_MAXDEGREE, ROOT);
+//        CreateSubtree2(RANDOM_TREE_MAXHEIGHT, RANDOM_TREE_MAXDEGREE, ROOT);
 //        ddos_marking.graphics.DisplaySimpleTree.DrawTree(ROOT);
 //        saveSubtree(ROOT, SYSTEM_VARIABLE.file);
 //        Scanner scn = new Scanner(System.in);
@@ -41,14 +41,24 @@ public class CreateRandomTree {
         if (args.length > 1) {
             SYSTEM_VARIABLE.B = Integer.parseInt(args[1]);
         }
+        if (args.length > 2) {
+            SYSTEM_VARIABLE.OMEGA = Double.parseDouble(args[2]);
+        }
+        if (args.length > 3) {
+            SYSTEM_VARIABLE.file = args[3];
+        }
+
+        if (args.length > 4) {
+            SYSTEM_VARIABLE.SIMULATION_TIME = Long.parseLong(args[4]);
+        }
         System.out.println("Starting Problem " + SYSTEM_VARIABLE.ASSIGNMENT_POLICY);
-        
-        //SYSTEM_VARIABLE.file = "tree2.txt";
+
+        SYSTEM_VARIABLE.file = "tree_exp_real.txt";
         ROOT = readSubtree(SYSTEM_VARIABLE.file);
 //      
 ////        Optimization1 OP = new Optimization1(ROOT);
 ////        System.out.println(OP.FindDPAssignment(30));
-//        ddos_marking.graphics.DisplaySimpleTree.DrawTree(ROOT);
+        ddos_marking.graphics.DisplaySimpleTree.DrawTree(ROOT);
         traverseTree(ROOT);
         StartRouting(ROOT);
 
@@ -174,6 +184,37 @@ public class CreateRandomTree {
             N.C.add(n);
             n.P = N;
             CreateSubtree(depth - 1, degree, n);
+        }
+
+        if (deg == 0) {
+            CreateUser(N);
+            return;
+        }
+    }
+
+    public static void CreateSubtree2(int depth, int degree, Node N) {
+
+        if (depth <= 0) {
+            CreateUser(N);
+            return;
+        }
+//        if (Math.random() <= 0.1) {
+//            CreateUser(N);
+//            return;
+//        }
+        if (Math.random() <= INTERNAL_NODE_USER_PROBABILITY) {
+            CreateUser(N);
+        }
+
+        int deg = degree;
+        if (deg > 0) {
+            deg++;
+        }
+        for (int c = 0; c < deg; c++) {
+            Node n = new Node(++label);
+            N.C.add(n);
+            n.P = N;
+            CreateSubtree2(depth - 1, degree, n);
         }
 
         if (deg == 0) {

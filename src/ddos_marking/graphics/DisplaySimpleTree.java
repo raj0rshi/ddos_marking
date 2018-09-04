@@ -73,8 +73,8 @@ class DisplayPanel extends JPanel {
         String s = Integer.toString(root.L)+"-"+root.U.size();
         dx = root.xpos * XSCALE;
         dy = root.ypos * YSCALE;
-       g.drawString(s, dx, dy);
-       //g.drawOval(dx-3, dy-3, 6, 6);
+      // g.drawString(s, dx, dy);
+       g.drawOval(dx-3, dy-3, 6, 6);
         if (root != null) {
             for (Node c : root.C) {
                 dx2 = c.xpos * XSCALE;

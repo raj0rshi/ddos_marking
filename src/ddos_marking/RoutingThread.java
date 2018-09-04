@@ -41,7 +41,7 @@ public class RoutingThread implements Runnable {
                     }
                     try {
                         // System.out.println("packet generator sleeping at node :" + N.L);
-                        Thread.sleep((int) (10));
+                        Thread.sleep((int) (30));
                         // System.out.println("packet generator waking up at node :" + N.L);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(RoutingThread.class.getName()).log(Level.SEVERE, null, ex);

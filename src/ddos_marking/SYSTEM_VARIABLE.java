@@ -25,13 +25,13 @@ public class SYSTEM_VARIABLE {
     public static final int V = -3;
     public static final int U = -4;
     // public static final String file = "tree2.txt";
-    public static String file = "tree_exp_6.txt";
-    public static final double OMEGA = 0.5;
-    public static int B = 30;
-    public static final long SIMULATION_TIME = 200000;
-    public static final long ASSIGNMENT_INTERVAL = 100000;
+    public static String file = "tree_exp_2.txt";
+    public static double OMEGA = 0.5;
+    public static int B = 50;
+    public static long SIMULATION_TIME = 300000;
+    public static final long ASSIGNMENT_INTERVAL = 200000;
 
-    public static final long PATHUPDATE_INTERVAL = 100;
+    public static final long PATHUPDATE_INTERVAL = 10000;
     public static long ASSIGNMENT_POLICY = 2;
     public static final long LOG_INTERVAL = 2000;
     static boolean KNOWS_TOPOLOGY = true;

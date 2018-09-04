@@ -110,7 +110,7 @@ public class Optimization1 {
 
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                this.LCA[i][j] = findLCA(i, j);
+                this.LCA[this.NodesTopToButtom.get(i).L][this.NodesTopToButtom.get(j).L] = findLCA(this.NodesTopToButtom.get(i).L, this.NodesTopToButtom.get(j).L);
             }
         }
     }

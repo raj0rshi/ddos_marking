@@ -212,17 +212,11 @@ public class Node {
     long starttime = System.currentTimeMillis();
     boolean flag = true;
     boolean assigned = false;
-    static File f = new File("P" + SYSTEM_VARIABLE.ASSIGNMENT_POLICY + "-B" + SYSTEM_VARIABLE.B + "-MP" + SYSTEM_VARIABLE.MARKING_PROBABILITY + "-" + SYSTEM_VARIABLE.file + "-output.csv");
+    static File f = new File("P" + SYSTEM_VARIABLE.ASSIGNMENT_POLICY + "-B" + SYSTEM_VARIABLE.B +  "-W" + SYSTEM_VARIABLE.OMEGA + "-MP" + SYSTEM_VARIABLE.MARKING_PROBABILITY + "-" + SYSTEM_VARIABLE.file + "-output.csv");
     static FileWriter fw;
 
     private void ProcessByVictim(Packet P) throws FileNotFoundException, IOException {
         packet_count++;
-        if ((System.currentTimeMillis() - systime3) > SYSTEM_VARIABLE.SIMULATION_TIME) {
-            fw.flush();
-            fw.close();
-            FormatOutput.main(f);
-            System.exit(0);
-        }
 
         if (P.isLegit) {
             incLPC();
@@ -294,13 +288,16 @@ public class Node {
                 // CreateRandomTree.PrintTree(root2);
 
                 if (SYSTEM_VARIABLE.ASSIGNMENT_POLICY == 1) {
+                    System.out.println("*******P1********");
                     g = OP.FindAssignment(SYSTEM_VARIABLE.B);
                 }
                 if (SYSTEM_VARIABLE.ASSIGNMENT_POLICY == 2) {
-                   // OP.CalculateDP(SYSTEM_VARIABLE.B);
+                    // OP.CalculateDP(SYSTEM_VARIABLE.B);
+                     System.out.println("*******P2********");
                     g = OP.FindDPAssignment(SYSTEM_VARIABLE.B);
                 }
                 if (SYSTEM_VARIABLE.ASSIGNMENT_POLICY == 3) {
+                     System.out.println("*******P3********");
                     g = OP.NaiveAssignment(SYSTEM_VARIABLE.B);
                 }
                 //  System.out.println("optimal assignment: " + g.toString());
@@ -341,7 +338,12 @@ public class Node {
     int lessLUCount = 0;
 
     public void log() throws IOException {
-
+        if ((System.currentTimeMillis() - starttime) > SYSTEM_VARIABLE.SIMULATION_TIME) {
+            fw.flush();
+            fw.close();
+            FormatOutput.main(f);
+            System.exit(0);
+        }
         if (flag) {
             flag = false;
             fw.append("Time,\t Total Cost,\tTotal Received Attack Packet,\t Total Blocked  Attack Packet,\tTotal Legit Packt,\t Total Blocked Legit Packet,\tfilter used\n");
@@ -360,7 +362,7 @@ public class Node {
             System.out.println("Filter Used: -");
         }
         fw.append((System.currentTimeMillis() - starttime) + ",\t");
-        fw.append(Total_APF_Count / (Total_BAP_Count + 0.01) + ",\t");
+        fw.append(Total_APF_Count + ",\t");
         fw.append(Total_AP_Count + ",\t");
         fw.append(Total_BAP_Count + ",\t");
         fw.append(Total_LP_Count + ",\t");

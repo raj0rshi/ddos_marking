@@ -9,13 +9,11 @@ package ddos_marking;
  *
  * @author rajor
  */
-public class User {
-
-    public boolean isLegit = false;
-    public double dataRate = 0;
-
-    public User(boolean x, double dr) {
-        isLegit = x;
-        dataRate = dr;
+public class ChangeTopology {
+    
+    String input="tree_exp_2.txt";
+    String output="tree_exp_2.txt";
+    public static void main(String[] args) {
+        
     }
 }

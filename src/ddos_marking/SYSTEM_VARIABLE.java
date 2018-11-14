@@ -13,8 +13,8 @@ import java.util.Random;
  */
 public class SYSTEM_VARIABLE {
 
-    public static final double ATTACKER_RATIO = .4;
-    public static final int MAX_DATARATE = 10;
+    public static final double ATTACKER_RATIO = .84;
+    public static final int MAX_DATARATE = 2;
     public static final double INTERNAL_NODE_USER_PROBABILITY = 0.25;
 
     public static final double MARKING_PROBABILITY = .5;
@@ -24,12 +24,12 @@ public class SYSTEM_VARIABLE {
 
     public static final int V = -3;
     public static final int U = -4;
-    // public static final String file = "tree2.txt";
-    public static String file = "tree_exp_2.txt";
+   // public static String file = "tree_exp_2.txt";
+    public static String file = "tree_exp_6.txt";
     public static double OMEGA = 0.5;
-    public static int B = 50;
-    public static long SIMULATION_TIME = 300000;
-    public static final long ASSIGNMENT_INTERVAL = 200000;
+    public static int B = 100;
+    public static long SIMULATION_TIME = 700000;
+    public static final long ASSIGNMENT_INTERVAL = 20000;
 
     public static final long PATHUPDATE_INTERVAL = 10000;
     public static long ASSIGNMENT_POLICY = 2;

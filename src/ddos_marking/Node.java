@@ -25,6 +25,9 @@ public class Node {
     public int L;
     public Node P;
     double mp = 0;
+
+    double J_TL = 0;
+    double J_TC = 0;
     public ArrayList<Node> C;
     public ArrayList<User> U;
     ArrayList<ArrayList<Integer>> Q;
@@ -51,7 +54,7 @@ public class Node {
     //for optimization
     double BAT = 0;
     HashMap<Integer, Integer> CD;
-    static ArrayList<Integer> g = null;
+    static ArrayList<Integer> g = new ArrayList<Integer>();
 
     public Node(int L) {
         this.L = L;
@@ -212,7 +215,7 @@ public class Node {
     long starttime = System.currentTimeMillis();
     boolean flag = true;
     boolean assigned = false;
-    static File f = new File("P" + SYSTEM_VARIABLE.ASSIGNMENT_POLICY + "-B" + SYSTEM_VARIABLE.B +  "-W" + SYSTEM_VARIABLE.OMEGA + "-MP" + SYSTEM_VARIABLE.MARKING_PROBABILITY + "-" + SYSTEM_VARIABLE.file + "-output.csv");
+    static File f = new File("P" + SYSTEM_VARIABLE.ASSIGNMENT_POLICY + "-B" + SYSTEM_VARIABLE.B + "-W" + SYSTEM_VARIABLE.OMEGA + "-MP" + SYSTEM_VARIABLE.MARKING_PROBABILITY + "-" + SYSTEM_VARIABLE.file + "-output.csv");
     static FileWriter fw;
 
     private void ProcessByVictim(Packet P) throws FileNotFoundException, IOException {
@@ -293,11 +296,11 @@ public class Node {
                 }
                 if (SYSTEM_VARIABLE.ASSIGNMENT_POLICY == 2) {
                     // OP.CalculateDP(SYSTEM_VARIABLE.B);
-                     System.out.println("*******P2********");
+                    System.out.println("*******P2********");
                     g = OP.FindDPAssignment(SYSTEM_VARIABLE.B);
                 }
                 if (SYSTEM_VARIABLE.ASSIGNMENT_POLICY == 3) {
-                     System.out.println("*******P3********");
+                    System.out.println("*******P3********");
                     g = OP.NaiveAssignment(SYSTEM_VARIABLE.B);
                 }
                 //  System.out.println("optimal assignment: " + g.toString());
@@ -404,4 +407,8 @@ public class Node {
 
     static volatile int round = 1;
 
+    @Override
+    public String toString() {
+        return L + "";
+    }
 }

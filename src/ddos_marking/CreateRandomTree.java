@@ -53,12 +53,12 @@ public class CreateRandomTree {
         }
         System.out.println("Starting Problem " + SYSTEM_VARIABLE.ASSIGNMENT_POLICY);
 
-        SYSTEM_VARIABLE.file = "tree_exp_real.txt";
+      //  SYSTEM_VARIABLE.file = "tree_exp_real.txt";
         ROOT = readSubtree(SYSTEM_VARIABLE.file);
 //      
 ////        Optimization1 OP = new Optimization1(ROOT);
 ////        System.out.println(OP.FindDPAssignment(30));
-        ddos_marking.graphics.DisplaySimpleTree.DrawTree(ROOT);
+       // ddos_marking.graphics.DisplaySimpleTree.DrawTree(ROOT);
         traverseTree(ROOT);
         StartRouting(ROOT);
 
@@ -226,7 +226,7 @@ public class CreateRandomTree {
     public static void CreateUser(Node n) {
         int numbe_of_user = (int) (Math.random() * 6 + 1);
 
-        int Case = (int) (Math.random() * 100) % 3;
+        int Case = (int) (Math.random() * 100) % 2;
 
         if (Case == 0) {
             //all white

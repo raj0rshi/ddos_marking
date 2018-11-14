@@ -129,6 +129,10 @@ public class Optimization1 {
 
     }
 
+    public void CalculateD() {
+        CalculateD(root, 0);
+    }
+
     void PrintD() {
         System.out.println("distance from root to any node:");
         for (int i : D) {
@@ -142,6 +146,18 @@ public class Optimization1 {
             if (Nodes.containsKey(i)) {
                 Nodes.get(i).AL = ALs.get(i);
             }
+        }
+    }
+
+    public void ComputeAL() {
+        for (Node n : Nodes.values()) {
+            double AT = 0;
+            for (User u : n.U) {
+                if (!u.isLegit) {
+                    AT += u.dataRate;
+                }
+            }
+            n.AL = AT;
         }
     }
 
@@ -258,7 +274,7 @@ public class Optimization1 {
                     }
 
                     double p = Penalty(g.get(i), g.get(j));
-              //      System.out.println("penalty of " + "(" + g.get(i) + "," + g.get(j) + ")=" + p);
+                    //      System.out.println("penalty of " + "(" + g.get(i) + "," + g.get(j) + ")=" + p);
                     if (p < min_p) {
                         min_p = p;
                         min_i = i;
@@ -267,7 +283,7 @@ public class Optimization1 {
                 }
 
             }
-           // System.out.println("merging: " + g.get(min_i) + " & " + g.get(min_j));
+            // System.out.println("merging: " + g.get(min_i) + " & " + g.get(min_j));
 
             Node A = Nodes.get(LCA[g.get(min_i)][g.get(min_j)]);
             Node X1 = Nodes.get(g.get(min_i));
@@ -285,9 +301,8 @@ public class Optimization1 {
             g.add(A.L);
 
             //System.out.println(g + "cost:" + total_cost);
-
         }
-       // System.out.println("total cost:" + total_cost);
+        // System.out.println("total cost:" + total_cost);
         return g;
     }
 
@@ -309,7 +324,7 @@ public class Optimization1 {
                 L[n.L] += L[c.L];
             }
             L[n.L] += n.UL;
-           // System.out.print("L[" + n.L + "]=" + L[n.L] + " ");
+            // System.out.print("L[" + n.L + "]=" + L[n.L] + " ");
         }
         System.out.println();
         initA();
@@ -318,7 +333,7 @@ public class Optimization1 {
 
                 Node n = NodesButtomToTop.get(i);
                 int I = n.L;
-               // System.out.println("for [" + n.L + "," + j + "]");
+                // System.out.println("for [" + n.L + "," + j + "]");
                 if (n.C.size() == 0) // leaf node
                 {
                     // System.out.println(n.L+ " this is a leaf node");
@@ -341,11 +356,11 @@ public class Optimization1 {
                 {
                     double min_cost = 1000000000.0;
                     //option 2
-               //     System.out.println("option 2");
+                    //     System.out.println("option 2");
                     double p1 = findOptimalAssignmentWithOoutBlock(n, j);
 
                     double p2 = L[n.L];
-               //     System.out.println("(" + I + "," + j + ") " + "p1:" + p1 + " p2:" + p2);
+                    //     System.out.println("(" + I + "," + j + ") " + "p1:" + p1 + " p2:" + p2);
                     double p = OMEGA * p1 + (1 - OMEGA) * p2;
                     if (p < min_cost) {
                         min_cost = p;
@@ -357,7 +372,7 @@ public class Optimization1 {
                         A[I][j] = min_cost;
                     }
                     //option 1
-                 //   System.out.println("option 1");
+                    //   System.out.println("option 1");
 
                     if (n.AL == 0) {
                         for (int k1 = j; k1 >= 0; k1--) {
@@ -390,7 +405,7 @@ public class Optimization1 {
                                                 R[I][j][2] = k3;
                                                 R[I][j][3] = k4;
                                                 R[I][j][4] = 0;
-                                              //  System.out.println(k1 + " " + k2 + " " + k3 + " " + k4 + "C:" + min_cost);
+                                                //  System.out.println(k1 + " " + k2 + " " + k3 + " " + k4 + "C:" + min_cost);
                                                 A[I][j] = min_cost;
                                             }
 
@@ -405,8 +420,6 @@ public class Optimization1 {
                 }
             }
         }
-
-  
 
 //        //System.out.println("dp calculating done");
 //        //System.out.println("A");
@@ -573,7 +586,7 @@ public class Optimization1 {
     }
 
     ArrayList<Integer> FindDPAssignment(int B) {
- //     System.out.println("**********************finding dp assignment*********************************");
+        //     System.out.println("**********************finding dp assignment*********************************");
 
         System.out.println(NodesTopToButtom.size());
         for (Node n : NodesTopToButtom) {
@@ -586,9 +599,9 @@ public class Optimization1 {
             }
             //System.out.print(n.L + "[" + n.AL + "," + n.UL + "] ");
         }
-       // System.out.println("");
+        // System.out.println("");
         CalculateDP(B);
-     //  printA();
+        //  printA();
 
         ArrayList<AssTask> AsTsk = new ArrayList<AssTask>();
         ArrayList<Integer> g = new ArrayList<Integer>();
@@ -621,6 +634,36 @@ public class Optimization1 {
         }
         //    //System.out.println("finding dp assignment done");
         return g;
+    }
+
+    private void updateJ(HashMap<Integer, Node> F) {
+
+        for (Node n : F.values()) {
+            n.J_TL = 0;
+        }
+        for (Node n : F.values()) {
+            ArrayList<Integer> path = getPathToRoot(n);
+            for (int i : path) {
+                Node nn = Nodes.get(i);
+                double x = nn.AL;
+                for (Node c : nn.C) {
+                    x+=c.J_TL;
+                }
+            }
+
+        }
+        for (Node n : Nodes.values()) {
+
+            ArrayList<Integer> path = getPathToRoot(n);
+            // System.out.println(path);
+            for (int i : path) {
+                if (F.containsKey(i) || i == root.L) {
+                    n.J_TC = path.indexOf(i) * n.J_TL;
+                }
+            }
+
+        }
+
     }
 
     class AssTask {
@@ -733,6 +776,132 @@ public class Optimization1 {
             g.add(n.L);
         }
         return g;
+    }
+
+    public ArrayList<Integer> getPathToRoot(Node n) {
+        ArrayList<Integer> path = new ArrayList<Integer>();
+        Node temp = n;
+        while (temp != null) {
+
+            path.add(temp.L);
+            temp = temp.P;
+        }
+        return path;
+    }
+
+    double CalculateCost(ArrayList<Integer> F) {
+        double cost = 0;
+        for (Node n : Nodes.values()) {
+            double AT = 0;
+            for (User u : n.U) {
+                if (!u.isLegit) {
+                    AT += u.dataRate;
+                }
+            }
+            n.AL = AT;
+
+            if (AT > 0) {
+                //  AT = 1;
+                ArrayList<Integer> path = getPathToRoot(n);
+                // System.out.println(path);
+                for (int i : path) {
+                    if (F.contains(i) || i == root.L) {
+                        break;
+                    }
+                    cost += AT;
+                }
+
+            }
+
+        }
+
+        return cost;
+    }
+
+    public ArrayList<Integer> FindAssgnmentJieWu(int B) {
+    //    System.out.println("find jie wu assignment");
+        CalculateD();
+        ComputeAL();
+
+        for (Node n : getButtomUPNodes(root)) {
+            double x = 0;
+            for (User u : n.U) {
+                if (!u.isLegit) {
+                    x += u.dataRate;
+                }
+            }
+            for (Node c : n.C) {
+                x += c.J_TL;
+            }
+            n.J_TL = x;
+        }
+
+        for (Node n : Nodes.values()) {
+            n.J_TC = D[n.L] * n.J_TL;
+        }
+
+        HashMap<Integer, Node> F = new HashMap<Integer, Node>();
+        F.put(root.L, root);
+        while (F.size() <= (B)) {
+
+            updateJ(F);
+            Node added = null;
+            HashMap<Integer, Node> FC = new HashMap<Integer, Node>();
+            for (Node n : F.values()) {
+                for (Node c : n.C) {
+                    if ((c.J_TL > 0) && (!F.containsKey(c.L))) {
+                        FC.put(c.L, c);
+                    }
+                }
+            }
+
+            if (FC.size() == 0) {
+             //   System.out.println("size 0 breaking");
+                break;
+            }
+
+          //  System.out.println("F:" + F.toString());
+        //    System.out.println("FC:" + FC.toString());
+            double MAX_J_LC = Double.MIN_VALUE;
+            Node MAX_J_LC_NODE = null;
+            for (Node c : FC.values()) {
+                if (c.J_TC > MAX_J_LC) {
+                    MAX_J_LC = c.J_TC;
+                    MAX_J_LC_NODE = c;
+                }
+            }
+          //  System.out.println("max cost child:" + MAX_J_LC_NODE.L);
+            F.put(MAX_J_LC_NODE.L, MAX_J_LC_NODE);
+
+            added = MAX_J_LC_NODE;
+          //  System.out.println("add:" + MAX_J_LC_NODE.L);
+
+            ArrayList<Node> fval = new ArrayList<Node>(F.values());
+            for (Node n : fval) {
+                if (n.AL <= 0)//reduction
+                {
+                    boolean flag = true;
+                    for (Node c : n.C) {
+                        if ((c.J_TL > 0) && (!F.containsKey(c.L))) {
+                           // System.out.println(n.L + "->" + c.L + ":" + c.AL);
+                            flag = false;
+                        }
+                    }
+
+                    if (flag) {
+                     //   System.out.println("delete: " + n.L);
+                        F.remove(n.L);
+                    }
+                }
+            }
+
+            if (F.size() > B) {
+                F.remove(added.L);
+                break;
+            }
+        }
+
+        return new ArrayList<Integer>(F.keySet());
     }
 
 }

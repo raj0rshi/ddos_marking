@@ -14,12 +14,12 @@ import java.io.*;
 import java.util.*;
 
 public class DisplaySimpleTree extends JFrame {
-    
+
     JScrollPane scrollpane;
     DisplayPanel panel;
     public static int WIN_X = 1600;
     public static int WIN_Y = 800;
-    
+
     public DisplaySimpleTree(MyTree t) {
         panel = new DisplayPanel(t);
         panel.setPreferredSize(new Dimension(WIN_X, WIN_Y));
@@ -28,13 +28,13 @@ public class DisplaySimpleTree extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         pack();  // cleans up the window panel
     }
-    
+
     public static void DrawTree(Node r) {
-        
+
         MyTree t = new MyTree(); // t is Binary tree we are displaying
 
         t.root = r;
-        
+
         t.computeNodePositions(); //finds x,y positions of the tree nodes
         t.maxheight = t.treeHeight(t.root); //finds tree height for scaling y axis
         DisplaySimpleTree dt = new DisplaySimpleTree(t);//get a display panel
@@ -43,15 +43,15 @@ public class DisplaySimpleTree extends JFrame {
 }
 
 class DisplayPanel extends JPanel {
-    
+
     MyTree t;
-    
+
     public DisplayPanel(MyTree t) {
         this.t = t; // allows dispay routines to access the tree
         setBackground(Color.white);
         setForeground(Color.black);
     }
-    
+
     protected void paintComponent(Graphics g) {
         g.setColor(getBackground()); //colors the window
         g.fillRect(0, 0, getWidth(), getHeight());
@@ -63,12 +63,12 @@ class DisplayPanel extends JPanel {
         this.drawTree(g, t.root); // draw the tree
         revalidate(); //update the component panel
     }
-    
+
     public void drawTree(Graphics g, Node root) {//actually draws the tree
         int dx, dy, dx2, dy2;
         int XSCALE, YSCALE;
         XSCALE = 1;//scale x by total nodes in tree
-        YSCALE = 50; //scale y by tree height
+        YSCALE = 80; //scale y by tree height
 
         // System.out.println("[" + root.xpos + "," + root.ypos + "]");
         int ucount = 0;
@@ -82,16 +82,20 @@ class DisplayPanel extends JPanel {
         dy = root.ypos * YSCALE;
         // g.drawString(s, dx, dy);
         g.drawOval(dx - 3, dy - 3, 9, 9);
-        int i=0;
+        int i = 0;
         for (User u : root.U) {
             if (root.U.get(0).isLegit) {
                 g.setColor(Color.green);
             } else {
                 g.setColor(Color.red);
             }
-            g.drawRect(dx - 3-(root.U.size()/2)+i, dy + 6, 10, 10);
-            i++;
+            g.drawRect((int) (dx - 20 + i * (40.0 / root.U.size())), dy + 20, 10, 10);
+
             g.setColor(Color.black);
+            g.drawLine((int) (dx - 15 + i * (40.0 / root.U.size())), dy + 20, dx, dy);
+
+            i++;
+            break;
         }
         if (root != null) {
             for (Node c : root.C) {
@@ -105,23 +109,23 @@ class DisplayPanel extends JPanel {
 }
 
 class MyTree {
-    
+
     String inputString = new String();
     Node root;
     int totalnodes = 0; //keeps track of the inorder number for horiz. scaling 
     int maxheight = 0;//keeps track of the depth of the tree for vert. scaling
     private final int WIN_X = DisplaySimpleTree.WIN_X;
     private final int WIN_Y = DisplaySimpleTree.WIN_Y;
-    
+
     MyTree() {
         root = null;
     }
-    
+
     public int treeHeight(Node t) {
         if (t == null) {
             return -1;
         } else {
-            
+
             int max = Integer.MIN_VALUE;
             for (Node c : t.C) {
                 int h = treeHeight(c);
@@ -131,9 +135,9 @@ class MyTree {
             }
             return 1 + max;
         }
-        
+
     }
-    
+
     public void computeNodePositions() {
         int depth = 1;
         DFS_traversal(root, 0, WIN_X, 1);
@@ -149,7 +153,7 @@ class MyTree {
             }
         }
     }
-    
+
     public void DFS_traversal(Node root, int l, int r, int d) {
         if (root != null) { // inorder traversal to draw each node
             //   System.out.println(root.L);
@@ -163,7 +167,7 @@ class MyTree {
                 c_l += x_space;
             }
         }
-        
+
     }
-    
+
 }

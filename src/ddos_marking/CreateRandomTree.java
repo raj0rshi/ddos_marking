@@ -26,6 +26,8 @@ public class CreateRandomTree {
     static int label = 0;
     static Node ROOT;
 
+    static ArrayList<Thread> Threads = new ArrayList<Thread>();
+
     public static void main(String[] args) throws IOException {
 //        ROOT = new Node(label);
 //        CreateSubtree2(RANDOM_TREE_MAXHEIGHT, RANDOM_TREE_MAXDEGREE, ROOT);
@@ -53,29 +55,15 @@ public class CreateRandomTree {
         }
         System.out.println("Starting Problem " + SYSTEM_VARIABLE.ASSIGNMENT_POLICY);
 
-      //  SYSTEM_VARIABLE.file = "tree_exp_real.txt";
+        //  SYSTEM_VARIABLE.file = "tree_exp_real.txt";
         ROOT = readSubtree(SYSTEM_VARIABLE.file);
 //      
 ////        Optimization1 OP = new Optimization1(ROOT);
 ////        System.out.println(OP.FindDPAssignment(30));
-       // ddos_marking.graphics.DisplaySimpleTree.DrawTree(ROOT);
+        // ddos_marking.graphics.DisplaySimpleTree.DrawTree(ROOT);
         traverseTree(ROOT);
         StartRouting(ROOT);
 
-        Thread T = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    while (true) {
-                        ROOT.log();
-                        Thread.sleep(SYSTEM_VARIABLE.LOG_INTERVAL);
-                    }
-                } catch (Exception ex) {
-                    Logger.getLogger(CreateRandomTree.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        });
-        T.start();
 //
     }
 
@@ -283,6 +271,29 @@ public class CreateRandomTree {
         }
 
     }
+
+    public static void TreeGetAllNodes(Node root, HashMap<Integer, Node> Nodes) {
+
+        //  System.out.print(root.L + "(" + root.AL + "," + root.UL + ")" + "->");
+        Nodes.put(root.L, root);
+        for (Node c : root.C) {
+            //System.out.print(c.L + "(" + c.AL + "," + c.UL + ")" + " ");
+
+        }
+        for (User u : root.U) {
+            if (!u.isLegit) {
+                System.out.print("[A: " + u.dataRate + "]");
+            } else {
+                System.out.print("[L: " + u.dataRate + "]");
+            }
+
+        }
+        System.out.println("");
+        for (Node c : root.C) {
+            TreeGetAllNodes(c, Nodes);
+        }
+
+    }
     static HashSet<Integer> visited = new HashSet<Integer>();
 
     public static void PrintTree(Node root) {
@@ -320,6 +331,27 @@ public class CreateRandomTree {
         }
 
         return hasloop;
+    }
+
+    public static void StartAll(Node root) {
+        
+        ROOT=root;
+        StartRouting(root);
+        Thread T = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    while (true) {
+                        root.log();
+                        Thread.sleep(SYSTEM_VARIABLE.LOG_INTERVAL);
+                    }
+                } catch (Exception ex) {
+                    Logger.getLogger(CreateRandomTree.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+        T.start();
+
     }
 
     private static void StartRouting(Node root) {

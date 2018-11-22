@@ -1,4 +1,5 @@
 Time,	 Total Cost,	Total Received Attack Packet,	 Total Blocked  Attack Packet,	Total Legit Packt,	 Total Blocked Legit Packet,	filter used
-602,	408,	0,	0,	0,	0,	0,	
-2606,	63098,	11428,	0,	0,	0,	0,	
-4612,	62588,	11280,	0,	0,	0,	0,	
+401,	43,	8,	0,	31,	0,	0,	
+2406,	1559,	300,	0,	1559,	0,	0,	
+4411,	1559,	300,	0,	1561,	0,	0,	
+6416,	1560,	300,	0,	1559,	0,	0,	

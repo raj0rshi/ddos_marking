@@ -22,6 +22,11 @@ import java.util.logging.Logger;
  */
 public class Node {
 
+    private static boolean Runing = true;
+
+    private static int NumNodes = 0;
+
+    
     public int L;
     public Node P;
     double mp = 0;
@@ -56,6 +61,14 @@ public class Node {
     HashMap<Integer, Integer> CD;
     static ArrayList<Integer> g = new ArrayList<Integer>();
 
+    public static boolean getRunningStatus() {
+        return Runing;
+    }
+
+    public static void setRunningStatus(boolean run) {
+        Runing = run;
+    }
+
     public Node(int L) {
         this.L = L;
         Q = new ArrayList<ArrayList<Integer>>();
@@ -68,7 +81,7 @@ public class Node {
         BlockList = new HashSet<Integer>();
 
         if (f.exists()) {
-            f.delete();
+           // f.delete();
         }
         try {
             if (fw == null) {
@@ -282,6 +295,7 @@ public class Node {
                 // System.out.println("Printing tree after " + AttackCount + " " + LegitCount);
 
                 Optimization1 OP = new Optimization1(root2);
+                NumNodes=OP.N;
                 //  OP.PrintN();
                 // OP.CalculateLCA();
                 //  OP.PrintLCA();
@@ -341,15 +355,20 @@ public class Node {
     int lessLUCount = 0;
 
     public void log() throws IOException {
+
+
         if ((System.currentTimeMillis() - starttime) > SYSTEM_VARIABLE.SIMULATION_TIME) {
             fw.flush();
             fw.close();
-            FormatOutput.main(f);
+         //   FormatOutput.main(f);
+
+            setRunningStatus(false);
+            //  System.out.println("setting running status");
             System.exit(0);
         }
         if (flag) {
             flag = false;
-            fw.append("Time,\t Total Cost,\tTotal Received Attack Packet,\t Total Blocked  Attack Packet,\tTotal Legit Packt,\t Total Blocked Legit Packet,\tfilter used\n");
+            fw.append("Time,\t Total Cost,\tTotal Received Attack Packet,\t Total Blocked  Attack Packet,\tTotal Legit Packt,\t Total Blocked Legit Packet,\tfilter used,\tNum Nodes\n");
         } //            System.out.print("Path to " + P.Src + ": ");
         System.out.println("P" + SYSTEM_VARIABLE.ASSIGNMENT_POLICY + " ->Time:" + (System.currentTimeMillis() - starttime));
         System.out.println("Total Cost:" + Total_APF_Count / (Total_BAP_Count + 0.01));
@@ -364,6 +383,8 @@ public class Node {
         } else {
             System.out.println("Filter Used: -");
         }
+        
+         System.out.println("Number of Nodes:" + NumNodes);
         fw.append((System.currentTimeMillis() - starttime) + ",\t");
         fw.append(Total_APF_Count + ",\t");
         fw.append(Total_AP_Count + ",\t");
@@ -371,6 +392,7 @@ public class Node {
         fw.append(Total_LP_Count + ",\t");
         fw.append(Total_BLU_Count + ",\t");
         fw.append(filter_used + ",\t");
+        fw.append(NumNodes + ",\t");
         fw.append("\n");
 
         //clear assignment
@@ -402,10 +424,7 @@ public class Node {
         Total_LP_Count = 0;
         Total_BLU_Count = 0;
         Total_PACKET = 0;
-        round++;
     }
-
-    static volatile int round = 1;
 
     @Override
     public String toString() {

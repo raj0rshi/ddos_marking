@@ -24,6 +24,7 @@ public class RoutingThread implements Runnable {
         T = new Thread(this);
         N.T = T;
         T.start();
+        CreateRandomTree.Threads.add(T);
 
         // System.out.println("routing started at node: " + N.L + " with mp=" + N.mp);
         Thread UT = new Thread(new Runnable() {
@@ -46,6 +47,10 @@ public class RoutingThread implements Runnable {
                     } catch (InterruptedException ex) {
                         Logger.getLogger(RoutingThread.class.getName()).log(Level.SEVERE, null, ex);
                     }
+                    
+                    
+                    
+                  
                 }
             }
         });

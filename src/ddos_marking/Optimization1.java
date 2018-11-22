@@ -8,7 +8,10 @@ package ddos_marking;
 import static ddos_marking.SYSTEM_VARIABLE.OMEGA;
 import static ddos_marking.SYSTEM_VARIABLE.RANDOM_TREE_MAXDEGREE;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 /**
  *
@@ -316,7 +319,7 @@ public class Optimization1 {
         for (int i = NodesTopToButtom.size() - 1; i >= 0; i--) {
             NodesButtomToTop.add(NodesTopToButtom.get(i));
         }
-        System.out.println(NodesButtomToTop.size());
+        // System.out.println(NodesButtomToTop.size());
 
         for (Node n : NodesButtomToTop) {
             L[n.L] = 0;
@@ -326,14 +329,14 @@ public class Optimization1 {
             L[n.L] += n.UL;
             // System.out.print("L[" + n.L + "]=" + L[n.L] + " ");
         }
-        System.out.println();
+        //System.out.println();
         initA();
         for (int i = 0; i < NodesButtomToTop.size(); i++) {
             for (int j = 0; j <= B; j++) {
 
                 Node n = NodesButtomToTop.get(i);
                 int I = n.L;
-                // System.out.println("for [" + n.L + "," + j + "]");
+           //     System.out.println("for [" + n.L + "," + j + "]");
                 if (n.C.size() == 0) // leaf node
                 {
                     // System.out.println(n.L+ " this is a leaf node");
@@ -360,7 +363,7 @@ public class Optimization1 {
                     double p1 = findOptimalAssignmentWithOoutBlock(n, j);
 
                     double p2 = L[n.L];
-                    //     System.out.println("(" + I + "," + j + ") " + "p1:" + p1 + " p2:" + p2);
+                 //   System.out.println("(" + I + "," + j + ") " + "p1:" + p1 + " p2:" + p2 + "\t F:" + R2[n.L][j]);
                     double p = OMEGA * p1 + (1 - OMEGA) * p2;
                     if (p < min_cost) {
                         min_cost = p;
@@ -405,7 +408,7 @@ public class Optimization1 {
                                                 R[I][j][2] = k3;
                                                 R[I][j][3] = k4;
                                                 R[I][j][4] = 0;
-                                                //  System.out.println(k1 + " " + k2 + " " + k3 + " " + k4 + "C:" + min_cost);
+                                                //        System.out.println(k1 + " " + k2 + " " + k3 + " " + k4 + "C:" + min_cost);
                                                 A[I][j] = min_cost;
                                             }
 
@@ -423,7 +426,7 @@ public class Optimization1 {
 
 //        //System.out.println("dp calculating done");
 //        //System.out.println("A");
-//        printA();
+        //      printA();
 //        //System.out.println("R");
 //        printR();
     }
@@ -472,16 +475,45 @@ public class Optimization1 {
         //System.out.println("");
     }
 
-    private double findOptimalAssignmentWithOoutBlock(Node root, int j) {
+    private int reduceBAT(Node n, Node root, ArrayList<Integer> g) {
+        if (n == null) {
+            //System.out.println("calling reduce bat with null node");
+        }
+        if (root == null) {
+            //System.out.println("calling reduce bat with null root");
+        }
+        Node nn = n;
+
+        double red = n.BAT;
+        int d = 0;
+        //   //System.out.println("N: " + nn.L + " root:" + root.L);
+        while (nn.L != root.L) {
+
+            System.out.println(nn.L + " reduced by " + red);
+            nn.BAT -= red;
+            if (g.indexOf(nn.L) >= 0) {
+
+                break;
+            }
+            nn = nn.P;
+            if (nn == null) {
+                break;
+            }
+        }
+        root.BAT -= red;
+        return d;
+    }
+
+    private double findOptimalAssignmentWithOoutBlock2(Node root, int j) {
         //  //System.out.println("find op ass called at N:" + root.L + " B:" + j);
 
         ArrayList<Node> NODES = getButtomUPNodes(root);
-//        //System.out.println("buttom up nodes: ");
+//        System.out.println("buttom up nodes: ");
 //
 //        for (Node n : NODES) {
-//            //System.out.print(n.L + " ");
+//            System.out.print(n.L + " ");
 //        }
-//        //System.out.println("******");
+//        System.out.println("******");
         ArrayList<Integer> g = new ArrayList<Integer>();
         HashMap<Integer, Double> BENEFIT = new HashMap<Integer, Double>();
         for (Node n : NODES) {
@@ -492,7 +524,7 @@ public class Optimization1 {
             for (Node c : n.C) {
                 n.BAT += c.BAT;
             }
-            //  //System.out.print(n.L + "(" + n.BAT + ")");
+            //    System.out.print(n.L + "(" + n.BAT + ")");
             BENEFIT.put(n.L, n.BAT * (D[n.L] - D[root.L]));
         }
         // //System.out.println("");
@@ -513,7 +545,16 @@ public class Optimization1 {
             if (a != -1) {
                 double b = BENEFIT.remove(a);
 
+                System.out.println("removing:" + a);
+                System.out.println("before reduce BAT:" + Nodes.get(a).BAT);
+
                 reduceBAT(Nodes.get(a), root, g);
+
+                System.out.println("after reduce BAT:" + Nodes.get(a).BAT);
+
+                for (Node n : NODES) {
+                    System.out.print(n.L + "(" + n.BAT + ") ");
+                }
 
                 g.add(a);
                 benefit += b;
@@ -530,7 +571,7 @@ public class Optimization1 {
 
         //  //System.out.println("g" + g.toString());
         R2[root.L][j] = g;
-        // //System.out.println("benefit: " + benefit + " cost:" + cost + " return:" + (cost - benefit));
+        System.out.println("benefit: " + benefit + " cost:" + cost + " return:" + (cost - benefit));
         if ((j == 0) && (root.BAT > 0)) {
 
             g.clear();
@@ -543,6 +584,127 @@ public class Optimization1 {
         }
 
         return cost - benefit;
+    }
+
+    private double findOptimalAssignmentWithOoutBlock(Node root, int j) {
+
+        double cost = 0;
+        ArrayList<Node> nodes = new ArrayList<>();
+        ArrayList<Node> Q = new ArrayList<>();
+        Q.add(root);
+        while (!Q.isEmpty()) {
+            Node n = Q.remove(0);
+            nodes.add(n);
+            Q.addAll(n.C);
+
+            if (j == 0 && n.AL > 0) {
+
+                return 1000000;
+            }
+        }
+
+        HashMap<Integer, Double> W = new HashMap<Integer, Double>();
+        ArrayList<Node> F = new ArrayList<Node>();
+
+        F.add(root);
+        UpdateWeight(W, F, nodes, root);
+        while (F.size() < j) {
+            UpdateWeight(W, F, nodes, root);
+        //    System.out.println("W :" + W + "\tF:" + F);
+
+            int k = findMaxWNode(W);
+
+            if (W.get(k) == 0) {
+                break;
+            }
+            F.add(Nodes.get(k));
+        }
+        UpdateWeight(W, F, nodes, root);
+
+     //   System.out.println("W:" + W);
+        for (int i : W.keySet()) {
+
+            if (Nodes.get(i).AL > 0) {
+                cost += W.get(i);
+            }
+        }
+        ArrayList<Integer> FF = new ArrayList<Integer>();
+
+        for (Node k : F) {
+            FF.add(k.L);
+        }
+
+        R2[root.L][j] = FF;
+        return cost;
+    }
+
+    private int findMaxWNode(HashMap<Integer, Double> W) {
+        int k = Collections.max(W.entrySet(), HashMap.Entry.comparingByValue()).getKey();
+        return k;
+    }
+
+    private void UpdateWeight(HashMap<Integer, Double> W, ArrayList<Node> F, ArrayList<Node> nodes, Node root) {
+        HashMap<Integer, Double> FL = new HashMap<Integer, Double>();
+        for (int i = nodes.size() - 1; i >= 0; i--) {
+            Node n = nodes.get(i);
+            if (F.contains(n)) {
+                FL.put(n.L, 0.0);
+            } else {
+                double fl = 0;
+                for (User u : n.U) {
+                    if (!u.isLegit) {
+                        fl += u.dataRate;
+                    }
+                }
+                for (Node c : n.C) {
+                    fl += FL.get(c.L);
+                }
+              //  System.out.println("put: " + n.L + "\t W:" + fl + "\tFL:" + FL);
+                FL.put(n.L, fl);
+            }
+        }
+
+        for (int i = nodes.size() - 1; i >= 0; i--) {
+            Node n = nodes.get(i);
+            W.put(n.L, distTo(n, root, F) * FL.get(n.L));
+        }
+    }
+
+    private int distTo2(Node from, Node root, ArrayList<Node> F) {
+        int dist = 0;
+        Node n = from;
+
+        //System.out.println("N: "+ n+" \tN.p: "+ n.P);
+        while (n != null && n != root) {
+
+            if (F.contains(n)) {
+                //   System.out.println("breaking: " + n.L);
+                break;
+            }
+            n = n.P;
+            dist++;
+        }
+        //  System.out.println(from.L+"->"+root.L +":"+ dist+ " F:"+F);
+        return dist;
+    }
+
+    private int distTo(Node from, Node root, ArrayList<Node> F) {
+        int dist = 0;
+        Node n = from;
+
+        //System.out.println("N: "+ n+" \tN.p: "+ n.P);
+        while (n != null && n != root) {
+
+            if (F.contains(n)) {
+                //   System.out.println("breaking: " + n.L);
+                break;
+            }
+            n = n.P;
+            dist++;
+
+        }
+        //  System.out.println(from.L+"->"+root.L +":"+ dist+ " F:"+F);
+        return dist;
     }
 
     private int calculateDistance(Node n, Node root, ArrayList<Integer> g) {
@@ -559,32 +721,6 @@ public class Optimization1 {
         return d;
     }
 
-    private int reduceBAT(Node n, Node root, ArrayList<Integer> g) {
-        if (n == null) {
-            //System.out.println("calling reduce bat with null node");
-        }
-        if (root == null) {
-            //System.out.println("calling reduce bat with null root");
-        }
-        Node nn = n;
-        int d = 0;
-        //   //System.out.println("N: " + nn.L + " root:" + root.L);
-        while (nn.L != root.L) {
-
-//            //System.out.println(nn.L + " reduced by " + n.BAT);
-            nn.BAT -= n.BAT;
-            if (g.indexOf(nn.L) >= 0) {
-
-                break;
-            }
-            nn = nn.P;
-            if (nn == null) {
-                break;
-            }
-        }
-        return d;
-    }
-
     ArrayList<Integer> FindDPAssignment(int B) {
         //     System.out.println("**********************finding dp assignment*********************************");
 
@@ -592,9 +728,9 @@ public class Optimization1 {
         for (Node n : NodesTopToButtom) {
             for (User u : n.U) {
                 if (u.isLegit) {
-                    n.UL++;
+                    n.UL += u.dataRate;
                 } else {
-                    n.AL++;
+                    n.AL += u.dataRate;
                 }
             }
             //System.out.print(n.L + "[" + n.AL + "," + n.UL + "] ");
@@ -647,7 +783,7 @@ public class Optimization1 {
                 Node nn = Nodes.get(i);
                 double x = nn.AL;
                 for (Node c : nn.C) {
-                    x+=c.J_TL;
+                    x += c.J_TL;
                 }
             }
 
@@ -677,14 +813,14 @@ public class Optimization1 {
         }
     }
 
-    private void printA() {
+    public void printA() {
         for (int i = 0; i < A.length; i++) {
             for (int j = 0; j < A[0].length; j++) {
 
                 if (A[i][j] < 100000) {
-                    System.out.print("(" + i + "," + j + ")" + A[i][j] + " ");
+                    System.out.print("(" + i + "," + j + ")" + (A[i][j] + "          ").substring(0, 5) + "\t\t");
                 } else {
-                    System.out.print("(" + i + "," + j + ")" + "*" + " ");
+                    System.out.print("(" + i + "," + j + ")" + "*" + "\t\t");
                 }
             }
             System.out.println("");
@@ -790,6 +926,12 @@ public class Optimization1 {
     }
 
     double CalculateCost(ArrayList<Integer> F) {
+
+        ArrayList<Node> FF = new ArrayList<Node>();
+
+        for (int k : F) {
+            FF.add(Nodes.get(k));
+        }
         double cost = 0;
         for (Node n : Nodes.values()) {
             double AT = 0;
@@ -798,28 +940,45 @@ public class Optimization1 {
                     AT += u.dataRate;
                 }
             }
-            n.AL = AT;
+            //  n.AL = AT;
 
-            if (AT > 0) {
-                //  AT = 1;
-                ArrayList<Integer> path = getPathToRoot(n);
-                // System.out.println(path);
-                for (int i : path) {
-                    if (F.contains(i) || i == root.L) {
-                        break;
-                    }
-                    cost += AT;
-                }
-
-            }
+         //   System.out.println("n:" + n + " \t dist: " + distTo2(n, root, FF) + "\t cost: " + AT * distTo2(n, root, FF) + "\tF:" + FF);
+            cost += AT * distTo2(n, root, FF);
 
         }
 
         return cost;
     }
 
+    double CalculateCost2(ArrayList<Integer> F) {
+
+        HashSet<User> U = new HashSet<User>();
+        ArrayList<Node> Q = new ArrayList<Node>();
+        for (int k : F) {
+            Q.add(Nodes.get(k));
+        }
+
+        while (!Q.isEmpty()) {
+            Node n = Q.remove(0);
+            Q.addAll(n.C);
+            for (User u : n.U) {
+                if (u.isLegit) {
+                    U.add(u);
+                }
+            }
+
+        }
+
+        double cost = 0;
+
+        for (User u : U) {
+            cost += u.dataRate;
+        }
+        return cost;
+    }
+
     public ArrayList<Integer> FindAssgnmentJieWu(int B) {
-    //    System.out.println("find jie wu assignment");
+        //    System.out.println("find jie wu assignment");
         CalculateD();
         ComputeAL();
 
@@ -856,12 +1015,12 @@ public class Optimization1 {
             }
 
             if (FC.size() == 0) {
-             //   System.out.println("size 0 breaking");
+                //   System.out.println("size 0 breaking");
                 break;
             }
 
-          //  System.out.println("F:" + F.toString());
-        //    System.out.println("FC:" + FC.toString());
+            //  System.out.println("F:" + F.toString());
+            //    System.out.println("FC:" + FC.toString());
             double MAX_J_LC = Double.MIN_VALUE;
             Node MAX_J_LC_NODE = null;
             for (Node c : FC.values()) {
@@ -870,11 +1029,11 @@ public class Optimization1 {
                     MAX_J_LC_NODE = c;
                 }
             }
-          //  System.out.println("max cost child:" + MAX_J_LC_NODE.L);
+            //  System.out.println("max cost child:" + MAX_J_LC_NODE.L);
             F.put(MAX_J_LC_NODE.L, MAX_J_LC_NODE);
 
             added = MAX_J_LC_NODE;
-          //  System.out.println("add:" + MAX_J_LC_NODE.L);
+            //  System.out.println("add:" + MAX_J_LC_NODE.L);
 
             ArrayList<Node> fval = new ArrayList<Node>(F.values());
             for (Node n : fval) {
@@ -883,13 +1042,13 @@ public class Optimization1 {
                     boolean flag = true;
                     for (Node c : n.C) {
                         if ((c.J_TL > 0) && (!F.containsKey(c.L))) {
-                           // System.out.println(n.L + "->" + c.L + ":" + c.AL);
+                            // System.out.println(n.L + "->" + c.L + ":" + c.AL);
                             flag = false;
                         }
                     }
 
                     if (flag) {
-                     //   System.out.println("delete: " + n.L);
+                        //   System.out.println("delete: " + n.L);
                         F.remove(n.L);
                     }
                 }

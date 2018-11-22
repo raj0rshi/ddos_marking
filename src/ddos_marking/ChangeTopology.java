@@ -6,6 +6,7 @@
 package ddos_marking;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -14,24 +15,50 @@ import java.util.HashMap;
  */
 public class ChangeTopology {
 
-    static String input = "F:\\OneDrive - Temple University\\NetBeansProjects\\DDOS_MARKING\\topologies\\tree_exp_2.txt";
-    static String output = "topologies/tree_exp_6_ar_60.txt";
+  //  static String input = "F:\\OneDrive - Temple University\\NetBeansProjects\\DDOS_MARKING\\tree_exp_2.txt";
+    static String input = "topologies/test_tree.txt";
 
+//    public static void main(String[] args) throws IOException, InterruptedException {
+//
+//        for (int i = 0; i < 10; i++) {
+//            System.out.println("*******************started all*********************");
+//
+//            Node ROOT = CreateRandomTree.readSubtree(input);
+//            ROOT = ChangeUserAttackerRatio(ROOT, .75);
+//           // ddos_marking.graphics.DisplaySimpleTree.DrawTree(ROOT);
+//            //CreateRandomTree.saveSubtree(ROOT, output);
+//
+//            CreateRandomTree.StartAll(ROOT);
+//
+//            for (Thread T : CreateRandomTree.Threads) {
+//                T.join();
+//            }
+//        }
+//
+//    }
     public static void main(String[] args) throws IOException, InterruptedException {
 
+        int B=5;
         for (int i = 0; i < 10; i++) {
             System.out.println("*******************started all*********************");
 
             Node ROOT = CreateRandomTree.readSubtree(input);
             ROOT = ChangeUserAttackerRatio(ROOT, .75);
            // ddos_marking.graphics.DisplaySimpleTree.DrawTree(ROOT);
-            //CreateRandomTree.saveSubtree(ROOT, output);
+           // CreateRandomTree.saveSubtree(ROOT, output);
 
-            CreateRandomTree.StartAll(ROOT);
+            Optimization1 OP = new Optimization1(ROOT);
+   
+            ArrayList<Integer> F = OP.FindDPAssignment(B);
+          //  OP.printA();
+           
+           double c1=OP.CalculateCost(F);
+           double c2=OP.CalculateCost2(F);
+            System.out.println("c1: "+c1+ "\t c2:"+ c2);
+            System.out.println("C: "+ (SYSTEM_VARIABLE.OMEGA*c1+ (1-SYSTEM_VARIABLE.OMEGA)* c2));
+            System.out.println("CDP: " + OP.A[0][B]);
+            System.out.println(F);
 
-            for (Thread T : CreateRandomTree.Threads) {
-                T.join();
-            }
         }
 
     }

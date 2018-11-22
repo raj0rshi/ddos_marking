@@ -282,13 +282,13 @@ public class CreateRandomTree {
         }
         for (User u : root.U) {
             if (!u.isLegit) {
-                System.out.print("[A: " + u.dataRate + "]");
+             //   System.out.print("[A: " + u.dataRate + "]");
             } else {
-                System.out.print("[L: " + u.dataRate + "]");
+             //   System.out.print("[L: " + u.dataRate + "]");
             }
 
         }
-        System.out.println("");
+       // System.out.println("");
         for (Node c : root.C) {
             TreeGetAllNodes(c, Nodes);
         }

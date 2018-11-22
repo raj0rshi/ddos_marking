@@ -80,11 +80,11 @@ class DisplayPanel extends JPanel {
         String s = "" + (root.L) + "-" + ucount;
         dx = root.xpos * XSCALE;
         dy = root.ypos * YSCALE;
-        // g.drawString(s, dx, dy);
+         g.drawString(s, dx, dy);
         g.drawOval(dx - 3, dy - 3, 9, 9);
         int i = 0;
         for (User u : root.U) {
-            if (root.U.get(0).isLegit) {
+            if (u.isLegit) {
                 g.setColor(Color.green);
             } else {
                 g.setColor(Color.red);

@@ -336,7 +336,7 @@ public class Optimization1 {
 
                 Node n = NodesButtomToTop.get(i);
                 int I = n.L;
-           //     System.out.println("for [" + n.L + "," + j + "]");
+           //    System.out.println("for [" + n.L + "," + j + "]");
                 if (n.C.size() == 0) // leaf node
                 {
                     // System.out.println(n.L+ " this is a leaf node");
@@ -363,7 +363,7 @@ public class Optimization1 {
                     double p1 = findOptimalAssignmentWithOoutBlock(n, j);
 
                     double p2 = L[n.L];
-                 //   System.out.println("(" + I + "," + j + ") " + "p1:" + p1 + " p2:" + p2 + "\t F:" + R2[n.L][j]);
+             //       System.out.println("(" + I + "," + j + ") " + "p1:" + p1 + " p2:" + p2 + "\t F:" + R2[n.L][j]);
                     double p = OMEGA * p1 + (1 - OMEGA) * p2;
                     if (p < min_cost) {
                         min_cost = p;
@@ -408,7 +408,7 @@ public class Optimization1 {
                                                 R[I][j][2] = k3;
                                                 R[I][j][3] = k4;
                                                 R[I][j][4] = 0;
-                                                //        System.out.println(k1 + " " + k2 + " " + k3 + " " + k4 + "C:" + min_cost);
+                                              //  System.out.println(k1 + " " + k2 + " " + k3 + " " + k4 + "C:" + min_cost);
                                                 A[I][j] = min_cost;
                                             }
 
@@ -610,7 +610,7 @@ public class Optimization1 {
         UpdateWeight(W, F, nodes, root);
         while (F.size() < j) {
             UpdateWeight(W, F, nodes, root);
-        //    System.out.println("W :" + W + "\tF:" + F);
+//            System.out.println("W :" + W + "\tF:" + F);
 
             int k = findMaxWNode(W);
 
@@ -621,13 +621,15 @@ public class Optimization1 {
         }
         UpdateWeight(W, F, nodes, root);
 
-     //   System.out.println("W:" + W);
-        for (int i : W.keySet()) {
-
-            if (Nodes.get(i).AL > 0) {
-                cost += W.get(i);
-            }
+       // System.out.println("W:" + W);
+        
+        
+        for(Node n: nodes)
+        {
+            cost+=n.AL*distTo(n, root, F);
         }
+        
+        
         ArrayList<Integer> FF = new ArrayList<Integer>();
 
         for (Node k : F) {
@@ -659,7 +661,7 @@ public class Optimization1 {
                 for (Node c : n.C) {
                     fl += FL.get(c.L);
                 }
-              //  System.out.println("put: " + n.L + "\t W:" + fl + "\tFL:" + FL);
+            //    System.out.println("put: " + n.L + "\t W:" + fl + "\tFL:" + FL);
                 FL.put(n.L, fl);
             }
         }
@@ -724,7 +726,7 @@ public class Optimization1 {
     ArrayList<Integer> FindDPAssignment(int B) {
         //     System.out.println("**********************finding dp assignment*********************************");
 
-        System.out.println(NodesTopToButtom.size());
+//        System.out.println(NodesTopToButtom.size());
         for (Node n : NodesTopToButtom) {
             for (User u : n.U) {
                 if (u.isLegit) {

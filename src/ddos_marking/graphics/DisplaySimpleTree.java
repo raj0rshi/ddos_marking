@@ -80,7 +80,7 @@ class DisplayPanel extends JPanel {
         String s = "" + (root.L) + "-" + ucount;
         dx = root.xpos * XSCALE;
         dy = root.ypos * YSCALE;
-         g.drawString(s, dx, dy);
+        g.drawString(s, dx, dy);
         g.drawOval(dx - 3, dy - 3, 9, 9);
         int i = 0;
         for (User u : root.U) {
@@ -89,10 +89,12 @@ class DisplayPanel extends JPanel {
             } else {
                 g.setColor(Color.red);
             }
-            g.drawRect((int) (dx - 20 + i * (40.0 / root.U.size())), dy + 20, 10, 10);
+            g.drawRect((int) (dx - 20 + i * (40.0 / root.U.size())), dy + 20, 15, 15);
 
             g.setColor(Color.black);
             g.drawLine((int) (dx - 15 + i * (40.0 / root.U.size())), dy + 20, dx, dy);
+
+            g.drawString((u.dataRate+"").substring(0,3), (int) (dx - 30 + i * (40.0 / root.U.size())), dy + 30);
 
             i++;
             break;

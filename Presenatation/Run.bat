@@ -1,10 +1,1 @@
 java -jar dist/DDOS_MARKING.jar
-java -jar dist/DDOS_MARKING.jar
-java -jar dist/DDOS_MARKING.jar
-java -jar dist/DDOS_MARKING.jar
-java -jar dist/DDOS_MARKING.jar
-java -jar dist/DDOS_MARKING.jar
-java -jar dist/DDOS_MARKING.jar
-java -jar dist/DDOS_MARKING.jar
-java -jar dist/DDOS_MARKING.jar
-java -jar dist/DDOS_MARKING.jar

@@ -101,8 +101,8 @@ public class Permutation {
 
     public static void main(String[] args) throws IOException {
 
-        int B = 4;
-        Node ROOT = ddos_marking.CreateRandomTree.readSubtree("test\\test3.txt");
+        int B = 5;
+        Node ROOT = ddos_marking.CreateRandomTree.readSubtree("topologies\\test_tree.txt");
         ddos_marking.graphics.DisplaySimpleTree.DrawTree(ROOT);
 
         opt1 = new Optimization1(ROOT);
@@ -120,6 +120,8 @@ public class Permutation {
         ArrayList<Integer> F_Naive = opt1.NaiveAssignment(B);
         double naive_cost = opt1.CalculateCost(F_Naive);
         printCombination(arr, arr.length, B);
+        System.out.println(optimal_f);
+        
         //  System.out.println("opt finished");
         double greedy_cost = opt1.CalculateCost(F_Greedy);
         System.out.print("G cost:\t" + greedy_cost + "\t");

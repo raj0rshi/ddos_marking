@@ -149,6 +149,52 @@ public class CreateRandomTree {
         }
     }
 
+    static int nodes = 0;
+
+    public static Node CreateTree(int N, int degree) {
+        ArrayList<Node> Nodes = new ArrayList< Node>();
+        ArrayList<Node> Nodes2 = new ArrayList< Node>();
+        for (int i = 0; i < N; i++) {
+            Node I = new Node(i);
+            Nodes.add(I);
+            Nodes2.add(I);
+
+        }
+
+        ArrayList<Node> Branches = new ArrayList< Node>();
+        Branches.add(Nodes.get(0));
+        Node root = Nodes.remove(0);
+        while (!Nodes.isEmpty()) {
+            Node n = Nodes.remove(0);
+            //System.out.println(Branches.size());
+            int rand_parent = (int) (Math.random() * Branches.size() * 100) % Branches.size();
+            //System.out.println(rand_parent);
+            Node p = Branches.get(rand_parent);
+
+            if (p.C.size() < degree) {
+                p.C.add(n);
+                n.P = p;
+                Branches.add(n);
+            } else {
+                Branches.remove(rand_parent);
+
+            }
+
+        }
+        Nodes2.remove(0);
+        for (Node n : Nodes2) {
+            if (n.C.size() == 0) {
+                if (Math.random() < SYSTEM_VARIABLE.INTERNAL_NODE_USER_PROBABILITY) {
+                    CreateUser(n);
+                }
+            } else {
+                CreateUser(n);
+            }
+        }
+
+        return root;
+    }
+
     public static void CreateSubtree(int depth, int degree, Node N) {
 
         if (depth <= 0) {
@@ -172,6 +218,41 @@ public class CreateRandomTree {
             N.C.add(n);
             n.P = N;
             CreateSubtree(depth - 1, degree, n);
+        }
+
+        if (deg == 0) {
+            CreateUser(N);
+            return;
+        }
+    }
+
+    public static void CreateSubtree3(int depth, int degree, Node N) {
+
+        System.out.println("N:" + nodes + "\tD:" + depth);
+        if ((depth <= 0) || (nodes <= 0)) {
+            CreateUser(N);
+            return;
+        }
+
+        if (Math.random() <= INTERNAL_NODE_USER_PROBABILITY) {
+            CreateUser(N);
+        }
+
+        int deg = (int) (Math.random() * 100 % degree);
+        if (deg > 0) {
+            deg++;
+        }
+        for (int c = 0; c < deg; c++) {
+
+            Node n = new Node(++label);
+            N.C.add(n);
+            n.P = N;
+            nodes--;
+            if (nodes <= 0) {
+                break;
+            }
+            CreateSubtree3(depth - 1, degree, n);
+
         }
 
         if (deg == 0) {
@@ -282,13 +363,13 @@ public class CreateRandomTree {
         }
         for (User u : root.U) {
             if (!u.isLegit) {
-             //   System.out.print("[A: " + u.dataRate + "]");
+                //   System.out.print("[A: " + u.dataRate + "]");
             } else {
-             //   System.out.print("[L: " + u.dataRate + "]");
+                //   System.out.print("[L: " + u.dataRate + "]");
             }
 
         }
-       // System.out.println("");
+        // System.out.println("");
         for (Node c : root.C) {
             TreeGetAllNodes(c, Nodes);
         }
@@ -334,8 +415,8 @@ public class CreateRandomTree {
     }
 
     public static void StartAll(Node root) {
-        
-        ROOT=root;
+
+        ROOT = root;
         StartRouting(root);
         Thread T = new Thread(new Runnable() {
             @Override
